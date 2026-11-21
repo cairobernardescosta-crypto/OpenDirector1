@@ -163,3 +163,15 @@ Update this document when architectural principles or development direction chan
 - [Bilingual interface](docs/development/i18n.md) describes language selection, message organization, review entry points, and checks.
 
 Maintain current tasks, defects, and execution progress in issues, PRs, and topic records where needed. The documentation index links only to files included in Git; local development materials and neighboring repositories must not become required reading for other developers. Explain relevant designs and capabilities directly in this repository rather than using another product's name in place of specific semantics.
+
+## Local repository governance — PPC 3.0 (OpenDirector1 fork)
+
+This section supplements the upstream OpenDirector guidance above and applies to work in this fork. It must not override product architecture, security, licensing or existing functional requirements. Full procedures: [docs/PPC.md](docs/PPC.md) and [docs/REGRESSION-PROTECTION.md](docs/REGRESSION-PROTECTION.md).
+
+- **Branch contract:** `dev` is the integration branch for ongoing implementation and fixes; `main` is reserved for approved releases. Never merge, push, commit or deploy to `main` as part of normal development without explicit repository-owner authorization.
+- **Preserve native behavior:** Start by inspecting the relevant code and existing rules. Prefer minimal scoped changes, existing services/components and the repository's native conventions. No unrelated rewrites, removals, API or data-contract breakage.
+- **Validation is discretionary:** Tests, lint, build, runtime checks and local installation happen **when the owner decides** or explicitly requests them. Do not impose mandatory per-fix tests, CI gates, GitHub Actions, or block implementation solely because tests were not executed. Never claim a test passed if it was not run; report exactly what was/was not verified.
+- **GitHub API / manual local updates:** Changes may accumulate on `dev` via GitHub API. Do not configure GitHub Actions, automatic deployment or automatic Windows/PowerShell synchronization. Local ZIP updates and manual validation are owner-driven.
+- **Regression and data protection:** Keep existing UI, canvas, editing, generation, models, integration settings, project persistence and exports working. Before risky changes, identify compatibility impacts and a rollback point. Never overwrite credentials, user projects or local data.
+- **History and backups:** Prefer focused, descriptive commits and avoid commit noise. Keep one principal deployed/local version plus one backup under the user's operating workflow; do not delete backups or change local installations through repository-only work.
+- **Release control:** Merging `dev` into `main`, tagging or publishing releases, and updating the Windows installation require explicit owner approval. See regression checklist for optional, risk-adjusted verification.
