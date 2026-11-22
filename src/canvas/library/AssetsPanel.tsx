@@ -174,9 +174,9 @@ export function AssetsPanel({
 
   return (
     <div className="cw-lib-panel">
-      <div className="cw-lib-tabs">
-        <label>
-          {t("library.collections.label")}
+      <div className="cw-lib-collection-toolbar">
+        <label className="cw-lib-collection-picker">
+          <span>{t("library.collections.label")}</span>
           <select
             aria-label={t("library.collections.label")}
             value={collectionId}
@@ -189,23 +189,26 @@ export function AssetsPanel({
             ))}
           </select>
         </label>
-        <button type="button" disabled={disabled || busy}
+        <button className="cw-lib-collection-new" type="button" disabled={disabled || busy}
           onClick={() => setCreatingCollection((value) => !value)}>
           {t("library.collections.new")}
         </button>
         {currentCollection && (
-          <>
-            <button type="button" disabled={disabled || busy}
-              onClick={() => { setBrowseAll((value) => !value); onChanged(); }}>
-              {browseAll ? currentCollection.name : t("library.collections.browse")}
-            </button>
-            <button type="button" disabled={disabled || busy || !selected.size}
-              onClick={() => void manageCollection("add")}>{t("library.collections.add")}</button>
-            <button type="button" disabled={disabled || busy || !selected.size}
-              onClick={() => void manageCollection("remove")}>{t("library.collections.remove")}</button>
-            <button type="button" disabled={disabled || busy}
-              onClick={() => void manageCollection("delete")}>{t("library.collections.delete")}</button>
-          </>
+          <details className="cw-lib-collection-menu" key={collectionId}>
+            <summary>{t("library.collections.actions")}</summary>
+            <div className="cw-lib-collection-menu-items">
+              <button type="button" disabled={disabled || busy}
+                onClick={() => { setBrowseAll((value) => !value); onChanged(); }}>
+                {browseAll ? currentCollection.name : t("library.collections.browse")}
+              </button>
+              <button type="button" disabled={disabled || busy || !selected.size}
+                onClick={() => void manageCollection("add")}>{t("library.collections.add")}</button>
+              <button type="button" disabled={disabled || busy || !selected.size}
+                onClick={() => void manageCollection("remove")}>{t("library.collections.remove")}</button>
+              <button type="button" disabled={disabled || busy}
+                onClick={() => void manageCollection("delete")}>{t("library.collections.delete")}</button>
+            </div>
+          </details>
         )}
       </div>
       {creatingCollection && (
