@@ -67,10 +67,10 @@ export function ExampleCanvasDialog({
             return (
               <li key={entry.id} className="cw-example-item" data-example-id={entry.id}>
                 <div className="cw-example-item-heading">
-                  <strong>{entry.title[locale]}</strong>
+                  <strong>{(entry.title[locale] ?? entry.title["en-US"])}</strong>
                   {size && <small>{size}</small>}
                 </div>
-                {entry.summary && <p className="cw-example-summary">{entry.summary[locale]}</p>}
+                {entry.summary && <p className="cw-example-summary">{(entry.summary[locale] ?? entry.summary["en-US"])}</p>}
                 <div className="cw-example-actions">
                   {running ? (
                     <>
