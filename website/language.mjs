@@ -8,7 +8,7 @@ for (const [locale, link] of links) {
 }
 
 if (document.documentElement.hasAttribute("data-language-entry")) {
-  let locale = /^zh(?:-|$)/i.test(navigator.language) ? "zh-CN" : "en-US";
+  let locale = /^zh(?:-|$)/i.test(navigator.language) ? "zh-CN" : /^pt(?:-|$)/i.test(navigator.language) ? "pt-BR" : "en-US";
   try {
     const saved = localStorage.getItem(localeKey);
     if (links.has(saved)) locale = saved;
