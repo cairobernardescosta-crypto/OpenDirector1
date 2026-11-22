@@ -1,5 +1,5 @@
 /** Locale contracts shared by the React provider, domain modules and tests. */
-export type Locale = "zh-CN" | "en-US";
+export type Locale = "zh-CN" | "en-US" | "pt-BR";
 
 export type PluralMessage = {
   one: string;
