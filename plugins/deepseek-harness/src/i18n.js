@@ -246,9 +246,31 @@ const zhCN = {
   'operation.notFound': '未找到操作 {operationId} 的已提交回执。请先检查工程状态再决定是否重试，不要自动生成新的 operationId。',
 }
 
+const ptBR = {
+  ...enUS,
+  'config.locale': 'O campo de configuração "locale" deve ser en-US, zh-CN ou pt-BR: {value}',
+  'tool.projects.description': 'Liste projetos do OpenDirector ou crie um com projectId e operationId explícitos.',
+  'tool.project.description': 'Leia o estado oficial do projeto, os modelos e a URL do canvas sem abrir sessão de edição.',
+  'tool.createGeneration.description': 'Crie um nó de geração e sua configuração. Isso não inicia uma tarefa.',
+  'tool.submit.description': 'Inicie uma tarefa de geração com resultados candidatos, sem adoção automática.',
+  'tool.job.description': 'Consulte uma tarefa de geração e seus resultados sem modificar o projeto.',
+  'tool.adoptResult.description': 'Adote explicitamente um resultado de geração existente.',
+  'tool.cancel.description': 'Solicite explicitamente o cancelamento remoto de uma tarefa.',
+  'tool.operation.description': 'Consulte o recibo de uma operação de gravação após um resultado desconhecido.',
+  'param.projectId': 'UUID do projeto OpenDirector.',
+  'param.operationId': 'UUID fornecido para esta operação. Reutilize apenas para repetir exatamente a mesma solicitação.',
+  'param.name': 'Nome do projeto exibido ao usuário.',
+  'param.prompt': 'Prompt de geração.',
+  'param.position': 'Posição no canvas.',
+  'param.positionX': 'Coordenada X no canvas.',
+  'param.positionY': 'Coordenada Y no canvas.',
+  'summary.project': 'Projeto',
+};
+
 export const catalogs = {
   'en-US': enUS,
   'zh-CN': zhCN,
+  'pt-BR': ptBR,
 }
 
 export function createMessages(locale) {
