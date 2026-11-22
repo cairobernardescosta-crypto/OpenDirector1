@@ -374,3 +374,48 @@ export async function purgeOne(
 ): Promise<{ purged: string[]; blobsRemoved: string[] }> {
   return changed(await request(`/library/trash/${id}`, { method: "DELETE" }));
 }
+
+/** Named collections reference existing global library assets (never own blobs). */
+export type LibraryCollection = {
+  id: string;
+  name: string;
+  createdAt: string;
+  itemIds: string[];
+};
+
+export async function listCollections(): Promise<LibraryCollection[]> {
+  return cachedRequest<LibraryCollection[]>(
+    "library:collections",
+    () => request<LibraryCollection[]>("/library/collections"),
+  );
+}
+
+export async function createCollection(name: string): Promise<LibraryCollection> {
+  return changed(await request<LibraryCollection>("/library/collections", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ name }),
+  }));
+}
+
+export async function renameCollection(id: string, name: string): Promise<LibraryCollection> {
+  return changed(await request<LibraryCollection>(`/library/collections/${id}`, {
+    method: "PATCH",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ name }),
+  }));
+}
+
+export async function setCollectionItems(id: string, itemIds: string[]): Promise<LibraryCollection> {
+  return changed(await request<LibraryCollection>(`/library/collections/${id}/items`, {
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ itemIds }),
+  }));
+}
+
+export async function deleteCollection(id: string): Promise<{ deleted: string; assetsDeleted: 0 }> {
+  return changed(await request<{ deleted: string; assetsDeleted: 0 }>(
+    `/library/collections/${id}`, { method: "DELETE" },
+  ));
+}
