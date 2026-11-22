@@ -1001,6 +1001,15 @@ export function WorkspaceView({ rt }: { rt: WorkspaceRuntime }) {
             >
               {t("common.englishShort")}
             </button>
+            <span aria-hidden="true">|</span>
+            <button
+              type="button"
+              className={locale === "pt-BR" ? "is-active" : ""}
+              aria-pressed={locale === "pt-BR"}
+              onClick={() => setLocale("pt-BR")}
+            >
+              {t("common.portugueseShort")}
+            </button>
           </div>
           <NodeInfoButton nodes={doc.nodes} />
           <span className="cw-save-status" title={saveStatusText}>
