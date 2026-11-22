@@ -1,6 +1,7 @@
 /** Biblioteca: tradução visual; IDs e dados de arquivos permanecem intactos. */
 export const library = {
- "library.collections.all": "Todos os arquivos",
+ "library.collections.all": "Todos os arquivos", "library.collections.browse": "Ver todos para adicionar",
+
  "library.collections.label": "Coleção",
  "library.collections.new": "Nova coleção",
  "library.collections.name": "Nome da coleção",
