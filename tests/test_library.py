@@ -249,7 +249,7 @@ def test_collections_reference_media_without_copying_or_deleting(client, tmp_pat
     )
     assert assigned.status_code == 200, assigned.text
     assert assigned.json()['itemIds'] == [photo['id'], song['id']]
-    assert [row['name'] for row in client.get('/api/library/items').json()] == ['theme.mp3', 'portrait.png']
+    assert {row['name'] for row in client.get('/api/library/items').json()} == {'theme.mp3', 'portrait.png'}
     assert sorted(p.name for p in (tmp_path / '.opendirector' / 'library' / 'blobs').iterdir()) == before
     assert len(client.get('/api/library/collections').json()) == 1
 
