@@ -57,6 +57,7 @@ function GeneralSettings({
         >
           <option value="zh-CN">{t("common.chinese")}</option>
           <option value="en-US">{t("common.english")}</option>
+          <option value="pt-BR">{t("common.portuguese")}</option>
         </select>
       </div>
       <div className="cw-settings-field">
