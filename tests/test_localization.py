@@ -3,6 +3,7 @@ from types import SimpleNamespace
 from opendirector_api.localization import (
     localized_error,
     localized_error_for_language,
+    wants_portuguese_language,
     wants_english,
 )
 
@@ -115,3 +116,18 @@ def test_another_window_is_not_reported_as_busy_storage() -> None:
     assert localized_error(request("zh-CN"), chinese=chinese, status=409, code="project_open_elsewhere") == chinese
     english = localized_error(request("en-US"), chinese=chinese, status=409, code="project_open_elsewhere")
     assert "another window" in english and "busy" not in english
+
+
+def test_portuguese_error_language_preserves_error_identity() -> None:
+    assert wants_portuguese_language("pt-BR,pt;q=0.9")
+    assert wants_portuguese_language("pt-PT")
+    assert not wants_portuguese_language("en-US")
+    assert localized_error_for_language("pt-BR", chinese="中文", status=409, code="operation_rejected") == (
+        "Não foi possível realizar a operação. Confira os dados e tente novamente."
+    )
+    assert localized_error_for_language("pt-BR", chinese="中文", status=422, code="capability_unavailable") == (
+        "Esta solicitação não é compatível."
+    )
+    assert localized_error_for_language("pt-BR", chinese="中文", status=504, code="unrecognized_code") == (
+        "O serviço externo excedeu o tempo limite. Confira o serviço e tente novamente."
+    )
