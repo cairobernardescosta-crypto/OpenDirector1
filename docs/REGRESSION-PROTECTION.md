@@ -22,6 +22,14 @@ Mudanças devem manter as capacidades já existentes do OpenDirector1; verifica�
 - Evitar remoções, renomeações públicas e mudanças de dados sem plano de compatibilidade.
 - Distinguir falhas já existentes das introduzidas pela mudança.
 
+## Regra de consistência e reutilização nativa
+
+Antes de criar qualquer botão, fonte, card, elemento, efeito, motion, layout, hook, serviço, integração ou função adicional, identificar o equivalente existente e reutilizar seu componente, token, contrato ou serviço. Estender e compor recursos nativos antes de criar alternativas. Novos recursos só devem surgir quando não houver opção compatível e devem integrar a arquitetura, a identidade visual, a navegação e a lógica de negócio do OpenDirector1.
+
+Evitar interfaces paralelas, funções duplicadas, estilos divergentes, ações inertes, simulações apresentadas como funcionais e desconexão entre UI, agente e backend. Preservar acessibilidade, internacionalização, dados e comportamento já implementado.
+
+**Registro opcional de revisão:** indicar a origem do componente/serviço reutilizado ou a razão para uma nova implementação; isto não obriga a executar testes por correção nem cria gates automáticos.
+
 ## Durante a edição
 - Usar componentes/serviços nativos; manter alterações restritas ao pedido.
 - Evitar duplicar regras de negócio entre interface e agente.
