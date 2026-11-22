@@ -4,6 +4,11 @@ import { errorMessage } from "../../backend/api";
 import { useT } from "../../i18n/I18nProvider";
 import {
   ASSET_CATEGORIES,
+  createCollection,
+  deleteCollection,
+  listCollections,
+  setCollectionItems,
+  type LibraryCollection,
   listItems,
   peekItems,
   sameLibraryItems,
@@ -46,10 +51,59 @@ export function AssetsPanel({
   const [kind, setKind] = useState<LibraryMediaKind | "">("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [collections, setCollections] = useState<LibraryCollection[]>([]);
+  const [collectionId, setCollectionId] = useState("");
+  const [newCollection, setNewCollection] = useState("");
+  const [creatingCollection, setCreatingCollection] = useState(false);
+  const currentCollection = collections.find((collection) => collection.id === collectionId);
+  const visibleItems = currentCollection
+    ? items.filter((item) => currentCollection.itemIds.includes(item.id))
+    : items;
+  const refreshCollections = async () => setCollections(await listCollections());
+  useEffect(() => {
+    let active = true;
+    listCollections().then((rows) => {
+      if (active) setCollections(rows);
+    }).catch((reason) => { if (active) setError(errorMessage(reason)); });
+    return () => { active = false; };
+  }, []);
+  const manageCollection = async (action: "create" | "add" | "remove" | "delete") => {
+    setBusy(true);
+    setError("");
+    try {
+      if (action === "create") {
+        const created = await createCollection(newCollection);
+        setNewCollection("");
+        setCreatingCollection(false);
+        await refreshCollections();
+        setCollectionId(created.id);
+        onNotice(t("library.collections.created"));
+      } else if (currentCollection) {
+        const ids = items.filter((item) => selected.has(item.id)).map((item) => item.id);
+        if (action === "delete") {
+          await deleteCollection(currentCollection.id);
+          setCollectionId("");
+          onNotice(t("library.collections.deleted"));
+        } else {
+          const next = action === "add"
+            ? [...new Set([...currentCollection.itemIds, ...ids])]
+            : currentCollection.itemIds.filter((id) => !ids.includes(id));
+          await setCollectionItems(currentCollection.id, next);
+          onNotice(t("library.collections.saved"));
+        }
+        await refreshCollections();
+      }
+      onChanged();
+    } catch (reason) {
+      setError(errorMessage(reason));
+    } finally {
+      setBusy(false);
+    }
+  };
   const input = useRef<HTMLInputElement>(null);
   useEffect(
-    () => onState(items, busy || Boolean(error)),
-    [items, busy, error, onState],
+    () => onState(visibleItems, busy || Boolean(error)),
+    [items, collections, collectionId, busy, error, onState],
   );
   useEffect(() => {
     let active = true;
@@ -120,6 +174,46 @@ export function AssetsPanel({
   return (
     <div className="cw-lib-panel">
       <div className="cw-lib-tabs">
+        <label>
+          {t("library.collections.label")}
+          <select
+            aria-label={t("library.collections.label")}
+            value={collectionId}
+            disabled={disabled || busy}
+            onChange={(event) => { setCollectionId(event.target.value); onChanged(); }}
+          >
+            <option value="">{t("library.collections.all")}</option>
+            {collections.map((entry) => (
+              <option key={entry.id} value={entry.id}>{entry.name}</option>
+            ))}
+          </select>
+        </label>
+        <button type="button" disabled={disabled || busy}
+          onClick={() => setCreatingCollection((value) => !value)}>
+          {t("library.collections.new")}
+        </button>
+        {currentCollection && (
+          <>
+            <button type="button" disabled={disabled || busy || !selected.size}
+              onClick={() => void manageCollection("add")}>{t("library.collections.add")}</button>
+            <button type="button" disabled={disabled || busy || !selected.size}
+              onClick={() => void manageCollection("remove")}>{t("library.collections.remove")}</button>
+            <button type="button" disabled={disabled || busy}
+              onClick={() => void manageCollection("delete")}>{t("library.collections.delete")}</button>
+          </>
+        )}
+      </div>
+      {creatingCollection && (
+        <form className="cw-lib-tabs" onSubmit={(event) => { event.preventDefault(); void manageCollection("create"); }}>
+          <input aria-label={t("library.collections.name")} placeholder={t("library.collections.name")}
+            value={newCollection} maxLength={255} required
+            onChange={(event) => setNewCollection(event.target.value)} />
+          <button type="submit" disabled={disabled || busy || !newCollection.trim()}>
+            {t("library.collections.create")}
+          </button>
+        </form>
+      )}
+      <div className="cw-lib-tabs">
         <button
           type="button"
           className={kind === "" ? "cw-lib-tab cw-lib-tab-on" : "cw-lib-tab"}
@@ -166,7 +260,7 @@ export function AssetsPanel({
             type="button"
             onClick={() => void remove()}
             disabled={
-              disabled || busy || !items.some((item) => selected.has(item.id))
+              disabled || busy || !visibleItems.some((item) => selected.has(item.id))
             }
           >
             {t("library.moveToTrash")}
@@ -174,14 +268,14 @@ export function AssetsPanel({
         </div>
       </div>
       {error && <p role="alert">{error}</p>}
-      {busy && !items.length && (
+      {busy && !visibleItems.length && (
         <p role="status">{t("library.assets.loading")}</p>
       )}
-      {!busy && !items.length && (
+      {!busy && !visibleItems.length && (
         <p className="cw-lib-empty">{t("library.assets.empty")}</p>
       )}
       <div className="cw-lib-grid">
-        {items.map((item) => (
+        {visibleItems.map((item) => (
           <MediaCard
             key={item.id}
             title={item.name}
