@@ -3,6 +3,7 @@ export const library = {
  "library.collections.all": "所有素材", "library.collections.browse": "浏览全部以添加",
 
  "library.collections.label": "素材集合",
+  "library.collections.actions": "集合操作",
  "library.collections.new": "新建集合",
  "library.collections.name": "集合名称",
  "library.collections.create": "创建",
