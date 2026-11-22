@@ -1,7 +1,7 @@
 /** Desktop lifecycle signals; business commands stay on the shared API. */
 export interface DesktopBridge {
   registerSession(id: string): void;
-  setLocale(locale: "zh-CN" | "en-US"): void;
+  setLocale(locale: "zh-CN" | "en-US" | "pt-BR"): void;
   showMore?(): void;
   setExporting(active: boolean): void;
 }
