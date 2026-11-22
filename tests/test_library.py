@@ -233,3 +233,44 @@ def test_trash_writes_nothing_inside_projects(client, tmp_path, store):
 
     after = {p.name: p.stat().st_mtime_ns for p in project_dir.rglob('*') if p.is_file()}
     assert before == after
+
+def test_collections_reference_media_without_copying_or_deleting(client, tmp_path):
+    """Collections are metadata over library assets, including audio."""
+    photo = upload(client, name='portrait.png').json()
+    song = upload(client, data=b'fake-audio-for-metadata', name='theme.mp3', mime='audio/mpeg').json()
+    before = sorted(p.name for p in (tmp_path / '.opendirector' / 'library' / 'blobs').iterdir())
+    created = client.post('/api/library/collections', json={'name': 'Bem Viver'})
+    assert created.status_code == 201, created.text
+    collection_id = created.json()['id']
+    assert created.json()['itemIds'] == []
+    assigned = client.put(
+        f'/api/library/collections/{collection_id}/items',
+        json={'itemIds': [photo['id'], song['id'], song['id']]},
+    )
+    assert assigned.status_code == 200, assigned.text
+    assert assigned.json()['itemIds'] == [photo['id'], song['id']]
+    assert [row['name'] for row in client.get('/api/library/items').json()] == ['theme.mp3', 'portrait.png']
+    assert sorted(p.name for p in (tmp_path / '.opendirector' / 'library' / 'blobs').iterdir()) == before
+    assert len(client.get('/api/library/collections').json()) == 1
+
+    deleted = client.delete(f'/api/library/collections/{collection_id}')
+    assert deleted.status_code == 200
+    assert deleted.json()['assetsDeleted'] == 0
+    assert client.get('/api/library/collections').json() == []
+    assert client.get(f"/api/library/items/{photo['id']}/content").status_code == 200
+    assert client.get(f"/api/library/items/{song['id']}/content").status_code == 200
+
+
+def test_collections_reject_nonexistent_or_trashed_items_without_partial_membership(client):
+    photo = upload(client).json()
+    created = client.post('/api/library/collections', json={'name': 'Week'}).json()
+    collection_id = created['id']
+    missing = str(uuid4())
+    assert client.put(f'/api/library/collections/{collection_id}/items',
+                      json={'itemIds': [photo['id'], missing]}).status_code == 422
+    assert client.get('/api/library/collections').json()[0]['itemIds'] == []
+    client.post('/api/library/items/trash', json={'itemIds': [photo['id']]})
+    assert client.put(f'/api/library/collections/{collection_id}/items',
+                      json={'itemIds': [photo['id']]}).status_code == 422
+    assert client.get('/api/library/collections').json()[0]['itemIds'] == []
+    assert client.post('/api/library/collections', json={'name': 'Week'}).status_code == 409
