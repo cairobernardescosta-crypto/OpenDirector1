@@ -2,6 +2,7 @@ export const library = {
  "library.collections.all": "All assets", "library.collections.browse": "Browse all to add",
 
  "library.collections.label": "Collection",
+  "library.collections.actions": "Collection actions",
  "library.collections.new": "New collection",
  "library.collections.name": "Collection name",
  "library.collections.create": "Create",
