@@ -187,8 +187,10 @@ def localized_error_for_language(
 ) -> str:
     if wants_portuguese_language(language):
         # Business identities and error codes stay unchanged. Unknown localized
-        # diagnostics receive an actionable generic Portuguese message.
+        # diagnostics fall back to existing English detail, never raw Chinese.
         return (PORTUGUESE_BY_CODE.get(code)
+                or ENGLISH_BY_CODE.get(code)
+                or timeline_error_message(code, "en-US")
                 or PORTUGUESE_BY_STATUS.get(status)
                 or PORTUGUESE_BY_CODE["operation_rejected"])
     specific = timeline_error_message(code, language)
