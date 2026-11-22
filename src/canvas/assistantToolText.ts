@@ -29,7 +29,7 @@ export function assistantToolText(
   t: Translate = defaultTranslate,
   code?: string,
 ): string {
-  if (getActiveLocale() !== "en-US" || !CJK.test(text)) return text;
+  if (getActiveLocale() === "zh-CN" || !CJK.test(text)) return text;
   const capability = capabilityErrorText(text, t);
   if (capability) return capability;
   // Codes describe the category; known detail above always takes priority.
