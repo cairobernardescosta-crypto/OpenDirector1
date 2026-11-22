@@ -5,6 +5,8 @@ import { enUS } from "../en-US/index.ts";
 import { common } from "./common.ts";
 import { settings } from "./settings.ts";
 import { library } from "./library.ts";
+import { assistant } from "./assistant.ts";
+import { generation } from "./generation.ts";
 import { canvas } from "./canvas.ts";
 import { canvasShell } from "./canvasShell.ts";
 import { canvasWorkspace } from "./canvasWorkspace.ts";
@@ -15,6 +17,8 @@ export const ptBR: Record<keyof typeof enUS, MessageEntry> = {
   ...common,
   ...settings,
   ...library,
+  ...assistant,
+  ...generation,
   ...canvas,
   ...canvasShell,
   ...canvasWorkspace,
