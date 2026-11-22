@@ -3,6 +3,7 @@
 Separate metadata: older library indexes and blob lifecycles remain untouched.
 A collection is never an owning reference and cannot delete an asset.
 """
+from __future__ import annotations
 from uuid import UUID, uuid4
 from pathlib import Path
 from typing import List
