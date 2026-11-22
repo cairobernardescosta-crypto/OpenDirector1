@@ -144,6 +144,110 @@
   min-height: 100%;
 }
 
+/* Collection management: a single compact row, without wrapping into the media tabs. */
+.cw-lib-collection-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 6px;
+  min-width: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.cw-lib-collection-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--cw-lib-muted);
+}
+
+.cw-lib-collection-picker > span {
+  flex-shrink: 0;
+}
+
+.cw-lib-collection-picker select {
+  min-width: 0;
+  width: clamp(110px, 24vw, 190px);
+  max-width: 100%;
+  border: 1px solid var(--cw-lib-input-border);
+  background: var(--cw-lib-input);
+  color: var(--cw-lib-fg);
+  border-radius: 8px;
+  padding: 7px 9px;
+  font: inherit;
+}
+
+.cw-lib-collection-toolbar button,
+.cw-lib-collection-menu summary {
+  font: inherit;
+  font-size: 13px;
+  color: var(--cw-lib-button-fg);
+  border: 1px solid var(--cw-lib-button-border);
+  border-radius: 8px;
+  background: var(--cw-lib-button);
+  padding: 7px 11px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cw-lib-collection-toolbar button:hover:not(:disabled),
+.cw-lib-collection-menu summary:hover {
+  background: var(--cw-lib-button-hover);
+}
+
+.cw-lib-collection-toolbar button:disabled {
+  cursor: default;
+  opacity: .45;
+}
+
+.cw-lib-collection-menu {
+  position: relative;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.cw-lib-collection-menu summary {
+  display: list-item;
+  list-style-position: inside;
+}
+
+.cw-lib-collection-menu-items {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: max-content;
+  min-width: 185px;
+  max-width: min(280px, 80vw);
+  padding: 6px;
+  border: 1px solid var(--cw-lib-border);
+  border-radius: 10px;
+  background: var(--cw-lib-bg);
+  box-shadow: var(--cw-lib-shadow);
+  z-index: 5;
+}
+
+.cw-lib-collection-menu-items button {
+  text-align: left;
+  white-space: normal;
+  width: 100%;
+  border: 0;
+  background: transparent;
+}
+
+@media (max-width: 600px) {
+  .cw-lib-collection-toolbar { gap: 7px; }
+  .cw-lib-collection-picker { gap: 5px; }
+  .cw-lib-collection-picker select { width: 110px; }
+  .cw-lib-collection-toolbar button,
+  .cw-lib-collection-menu summary { padding: 7px 8px; }
+}
+
 /* secondary tabs sit under the primary ones, underlined when active */
 .cw-lib-tabs {
   display: flex;
