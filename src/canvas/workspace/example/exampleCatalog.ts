@@ -11,6 +11,8 @@ import bundledCatalog from "../../../../apps/api/src/opendirector_api/example-ca
 export interface ExampleText {
   "zh-CN": string;
   "en-US": string;
+  /** Optional display translation; older and remote catalogs remain compatible. */
+  "pt-BR"?: string;
 }
 
 /** What the downloader is expected to find behind `url`. Content wins over this hint. */
