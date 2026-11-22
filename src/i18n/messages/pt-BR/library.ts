@@ -1,5 +1,16 @@
 /** Biblioteca: tradução visual; IDs e dados de arquivos permanecem intactos. */
 export const library = {
+ "library.collections.all": "Todos os arquivos",
+ "library.collections.label": "Coleção",
+ "library.collections.new": "Nova coleção",
+ "library.collections.name": "Nome da coleção",
+ "library.collections.create": "Criar",
+ "library.collections.add": "Adicionar selecionado",
+ "library.collections.remove": "Remover selecionado",
+ "library.collections.delete": "Excluir coleção",
+ "library.collections.deleted": "Coleção excluída; arquivos preservados.",
+ "library.collections.saved": "Coleção atualizada.",
+ "library.collections.created": "Coleção criada.",
  "library.title": "Biblioteca de arquivos",
  "library.sections": "Seções da biblioteca",
  "library.tab.assets": "Arquivos",
