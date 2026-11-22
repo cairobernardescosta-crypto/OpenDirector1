@@ -122,6 +122,48 @@ ENGLISH_BY_STATUS = {
 }
 
 
+PORTUGUESE_BY_STATUS = {
+    400: "A solicitação é inválida. Confira os dados e tente novamente.",
+    401: "Autenticação necessária. Entre novamente e tente outra vez.",
+    403: "Esta operação não é permitida.",
+    404: "O item solicitado não existe mais.",
+    409: "O item foi alterado ou está ocupado. Recarregue e tente novamente.",
+    413: "O arquivo ou a solicitação é grande demais.",
+    422: "Não foi possível aplicar a solicitação ao estado atual do projeto.",
+    500: "O serviço local encontrou um erro inesperado. Confira o terminal.",
+    501: "Esta funcionalidade ainda não é compatível.",
+    502: "O serviço externo falhou. Confira a configuração e tente novamente.",
+    503: "O serviço local está indisponível. Confira o terminal e tente novamente.",
+    504: "O serviço externo excedeu o tempo limite. Confira o serviço e tente novamente.",
+}
+
+PORTUGUESE_BY_CODE = {
+    "desktop_auth_required": "A conexão do aplicativo expirou. Abra o OpenDirector novamente.",
+    "capability_unavailable": "Esta solicitação não é compatível.",
+    "capability_paused": "Serviço pausado. Reative-o e tente novamente.",
+    "image_input_count": "Quantidade excessiva de imagens de entrada.",
+    "image_input_bytes": "As imagens excedem o limite de tamanho.",
+    "image_input_mask": "Confira a seleção da imagem.",
+    "tool_source_count": "Confira a quantidade de imagens de origem.",
+    "tool_source_type": "Os arquivos de origem devem ser imagens.",
+    "capability_connection_changed": "A conexão do modelo mudou durante a verificação. Envie novamente.",
+    "tool_no_video_match": "O objeto solicitado não foi encontrado no vídeo. Tente outra descrição.",
+    "voice_not_found": "A voz selecionada não existe mais. Atualize a biblioteca e selecione outra.",
+    "voice_size": "A gravação excede o limite de tamanho do serviço.",
+    "voice_duration": "A duração da gravação está fora dos limites do serviço.",
+    "voice_provider_timeout": "O serviço de voz excedeu o tempo limite. Confira o status e tente novamente.",
+    "voice_provider_quota": "A conta do serviço de voz não possui saldo ou recursos suficientes.",
+    "operation_rejected": "Não foi possível realizar a operação. Confira os dados e tente novamente.",
+    "invalid_input": "Dados inválidos. Confira as informações e tente novamente.",
+}
+
+
+def wants_portuguese_language(value: str | None) -> bool:
+    """Recognize Portuguese as a presentation language without changing API codes."""
+    primary = (value or "").split(",", 1)[0].split(";", 1)[0].strip().lower()
+    return primary == "pt" or primary.startswith("pt-")
+
+
 def wants_english_language(value: str | None) -> bool:
     """Use the primary Accept-Language tag, matching the browser decision."""
     value = (value or "").strip()
@@ -143,6 +185,12 @@ def localized_error_for_language(
     code: str = "operation_rejected",
     required_capability: Capability | None = None,
 ) -> str:
+    if wants_portuguese_language(language):
+        # Business identities and error codes stay unchanged. Unknown localized
+        # diagnostics receive an actionable generic Portuguese message.
+        return (PORTUGUESE_BY_CODE.get(code)
+                or PORTUGUESE_BY_STATUS.get(status)
+                or PORTUGUESE_BY_CODE["operation_rejected"])
     specific = timeline_error_message(code, language)
     if specific is not None:
         return specific
