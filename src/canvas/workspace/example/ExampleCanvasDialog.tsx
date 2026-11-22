@@ -97,7 +97,7 @@ export function ExampleCanvasDialog({
                   ) : status.phase === "done" ? (
                     <>
                       <span role="status" aria-live="polite">
-                        {t("canvas.example.state.done", { title: status.title ?? entry.title[locale] })}
+                        {t("canvas.example.state.done", { title: status.title ?? entry.title[locale] ?? entry.title["en-US"] })}
                       </span>
                       <button type="button" onClick={onClose}>
                         {t("canvas.example.action.close")}
