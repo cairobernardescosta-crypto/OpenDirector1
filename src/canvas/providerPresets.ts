@@ -41,7 +41,7 @@ const EN_GROUPS: Record<string, string> = {
 };
 
 function providerName(value: string): string {
-  return getActiveLocale() === "en-US" ? (EN_NAMES[value] ?? value) : value;
+  return getActiveLocale() !== "zh-CN" ? (EN_NAMES[value] ?? value) : value;
 }
 
 function optionLabel(value: string): string {
