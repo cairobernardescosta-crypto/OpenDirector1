@@ -27,6 +27,8 @@ export const common = {
   "common.chinese": "中文",
   "common.english": "English",
   "common.englishShort": "EN",
+  "common.portuguese": "葡萄牙语（巴西）",
+  "common.portugueseShort": "PT",
   "common.theme": "主题",
   "common.themeHint": "选择浅色或深色主题",
   "common.light": "浅色",
