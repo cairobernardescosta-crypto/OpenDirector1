@@ -63,6 +63,27 @@ const EXAMPLE_COPY: Record<Locale, ExampleCopy> = {
     subjectDescription:
       "Distant mountains, mist, and a small boat. The example media is original vector art drawn for this project.",
   },
+  "pt-BR": {
+    projectTitle: "Entre luz e montanhas · Estudo de cenas",
+    imageTitles: ["Entre luz e montanhas", "Antes do anoitecer"],
+    noteTitle: "Direção criativa",
+    noteText:
+      "Entre luz e montanhas\\n\\nNévoa matinal, montanhas distantes e um pequeno barco.\\nCores discretas e composição com espaço negativo.\\n\\n① Ambiente e emoção\\n② Personagem entra em cena\\n③ Câmera avança lentamente",
+    sceneTitle: "Cena · Manhã",
+    scenePrompt:
+      "Manhã, montanhas distantes e lago, névoa, tons de verde-azulado pouco saturados, plano aberto cinematográfico",
+    paletteTitle: "Paleta · Tons quentes",
+    palettePrompt:
+      "Manter a estrutura da cena, usar tons quentes de fim de tarde e preservar o clima tranquilo",
+    videoTitle: "Cena 01 · Aproximação lenta",
+    videoPrompt:
+      "Use a imagem de referência como primeiro quadro; a câmera avança lentamente enquanto o barco desliza pelo lago.",
+    timelineTitle: "Dois atos · Linha do tempo",
+    trackTitle: "Trilha de vídeo",
+    subjectTitle: "Referência de cena · Montanhas e lago",
+    subjectDescription:
+      "Montanhas distantes, névoa e um pequeno barco. A mídia de exemplo é uma ilustração vetorial original deste projeto.",
+  },
 };
 
 export const EXAMPLE_PROJECT_TITLE = EXAMPLE_COPY["zh-CN"].projectTitle;
