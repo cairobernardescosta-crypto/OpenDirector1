@@ -31,7 +31,7 @@ export function toolReasonText(
   t: Translate = defaultTranslate,
   reasonCode?: string,
 ): string | undefined {
-  if (!text || getActiveLocale() !== "en-US" || !/[\u3400-\u9fff]/.test(text))
+  if (!text || getActiveLocale() === "zh-CN" || !/[\u3400-\u9fff]/.test(text))
     return text;
   const capability = capabilityErrorText(text, t);
   if (capability) return capability;
