@@ -17,15 +17,15 @@ from opendirector.application.library import Library
 
 
 class Collection(Contract):
-    id: UUID
-    name: str = Field(min_length=1, max_length=255)
-    createdAt: str
-    itemIds: list[UUID] = Field(default_factory=list, max_length=100000)
+    id: UUID = Field(description='Stable collection identifier.')
+    name: str = Field(min_length=1, max_length=255, description='Human-readable collection name.')
+    createdAt: str = Field(description='UTC creation timestamp.')
+    itemIds: list[UUID] = Field(default_factory=list, max_length=100000, description='Existing library asset IDs, never owned blobs.')
 
 
 class CollectionIndex(Contract):
-    version: int = Field(default=1, ge=1, le=1)
-    collections: dict[UUID, Collection] = Field(default_factory=dict)
+    version: int = Field(default=1, ge=1, le=1, description='Version of the collection metadata index.')
+    collections: dict[UUID, Collection] = Field(default_factory=dict, description='Collections keyed by stable identity.')
 
 
 class LibraryCollections:
