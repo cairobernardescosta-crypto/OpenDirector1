@@ -34,6 +34,22 @@ Preservar código, funcionalidades e dados enquanto o fork evolui, evitando regr
 - Proteger os projetos locais, arquivos de usuário, credenciais, bancos e histórico contra sobrescrita ou migração destrutiva.
 - Revisar impactos de compatibilidade caso seja necessário modificar contratos públicos ou estruturas de dados.
 
+## 5.1. Regra obrigatória — reutilização nativa e padrão do código
+
+**Tudo que for criado ou modificado deve seguir o sistema, a arquitetura e os padrões de código já existentes no OpenDirector1.** Antes de implementar, localizar os recursos equivalentes no repositório, reutilizá-los e estendê-los quando necessário.
+
+- **Interface:** aproveitar botões, cards, campos, menus, sidebar, modais, painéis, nós, conectores, ícones, layouts, espaçamentos, cores, bordas, sombras, estados e componentes existentes.
+- **Identidade visual:** utilizar fontes, escalas tipográficas, temas, tokens de design, estilos, responsividade, estados de foco/hover/ativo e regras de acessibilidade nativas.
+- **Efeitos e movimento:** reutilizar animações, transições, motions, durações, easing, feedback visual e padrões de interação existentes; respeitar preferências de movimento reduzido.
+- **Funções e integrações:** reutilizar hooks, serviços, contratos, comandos, APIs, providers, validações, autenticação, persistência, eventos, mecanismos de execução e funções de negócio existentes.
+- **Funções adicionais:** quando uma nova função depender de outra já implementada, compor ou estender a função nativa, sem recriar lógica em paralelo nem criar estados inconsistentes entre UI, agentes e backend.
+- **Novas páginas e recursos:** integrar ao roteamento, navegação, estado, permissões, internacionalização, configuração e ciclo de vida nativos; não criar aplicações isoladas ou interfaces desconectadas.
+- **Ausência de componente compatível:** somente criar um novo componente, serviço ou padrão quando realmente não existir alternativa adequada; inseri-lo na camada nativa correta, documentar brevemente a justificativa e torná-lo reutilizável.
+- **Proibições:** não duplicar botões/cards, bibliotecas de design, animações, endpoints ou regras de negócio por conveniência; não introduzir outro framework visual ou serviço paralelo sem necessidade e autorização; não usar mocks, botões inertes ou funções simuladas como entrega funcional.
+- **Compatibilidade:** preservar comportamento, estrutura dos projetos, contratos e dados existentes. Mudanças devem respeitar segurança, acessibilidade, suporte bilíngue e desempenho previstos no projeto.
+
+**Ordem obrigatória de implementação:** localizar no código → reutilizar → estender/compor → criar nativamente apenas se faltar → registrar mudanças e validação realmente executada (quando solicitada). Esta regra vale para agentes de IA e desenvolvimento manual e não altera a política de validação livre.
+
 ## 6. Fluxo GitHub ↔ Windows
 - Código alterado diretamente no GitHub por API; GitHub não atualiza automaticamente o Windows.
 - **Sem GitHub Actions**, implantação automática, sincronização automática ou acesso implícito à instalação local.
