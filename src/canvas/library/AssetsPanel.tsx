@@ -53,10 +53,11 @@ export function AssetsPanel({
   const [error, setError] = useState("");
   const [collections, setCollections] = useState<LibraryCollection[]>([]);
   const [collectionId, setCollectionId] = useState("");
+  const [browseAll, setBrowseAll] = useState(false);
   const [newCollection, setNewCollection] = useState("");
   const [creatingCollection, setCreatingCollection] = useState(false);
   const currentCollection = collections.find((collection) => collection.id === collectionId);
-  const visibleItems = currentCollection
+  const visibleItems = currentCollection && !browseAll
     ? items.filter((item) => currentCollection.itemIds.includes(item.id))
     : items;
   const refreshCollections = async () => setCollections(await listCollections());
@@ -103,7 +104,7 @@ export function AssetsPanel({
   const input = useRef<HTMLInputElement>(null);
   useEffect(
     () => onState(visibleItems, busy || Boolean(error)),
-    [items, collections, collectionId, busy, error, onState],
+    [items, collections, collectionId, browseAll, busy, error, onState],
   );
   useEffect(() => {
     let active = true;
@@ -180,7 +181,7 @@ export function AssetsPanel({
             aria-label={t("library.collections.label")}
             value={collectionId}
             disabled={disabled || busy}
-            onChange={(event) => { setCollectionId(event.target.value); onChanged(); }}
+            onChange={(event) => { setCollectionId(event.target.value); setBrowseAll(false); onChanged(); }}
           >
             <option value="">{t("library.collections.all")}</option>
             {collections.map((entry) => (
@@ -194,6 +195,10 @@ export function AssetsPanel({
         </button>
         {currentCollection && (
           <>
+            <button type="button" disabled={disabled || busy}
+              onClick={() => { setBrowseAll((value) => !value); onChanged(); }}>
+              {browseAll ? currentCollection.name : t("library.collections.browse")}
+            </button>
             <button type="button" disabled={disabled || busy || !selected.size}
               onClick={() => void manageCollection("add")}>{t("library.collections.add")}</button>
             <button type="button" disabled={disabled || busy || !selected.size}
