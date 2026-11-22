@@ -19,7 +19,7 @@ import { join, relative } from "node:path";
 const root = process.cwd();
 const browserDir = join(root, "tests", "browser");
 const extraScripts = [join(root, "scripts", "verify_creation_browser.mjs")];
-const locales = ["en-US", "zh-CN"];
+const locales = ["en-US", "zh-CN", "pt-BR"];
 // locale.mjs switches languages on one page: it starts in English, stores a
 // Chinese preference, and asserts both.
 const switching = new Set(["locale.mjs", "bilingual_defaults.mjs"]);
@@ -109,7 +109,7 @@ for (const file of files) {
     }
     if (!locales.includes(found)) {
       problems.push(
-        `${rel}:${call.line}: unsupported locale "${found}"; use ${locales.join(" or ")}`,
+        `${rel}:${call.line}: unsupported locale "${found}"; use ${locales.join(", ")}`,
       );
       continue;
     }
