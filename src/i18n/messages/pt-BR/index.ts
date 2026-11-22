@@ -7,6 +7,9 @@ import { settings } from "./settings.ts";
 import { library } from "./library.ts";
 import { assistant } from "./assistant.ts";
 import { generation } from "./generation.ts";
+import { trace } from "./trace.ts";
+import { voiceLibrary } from "./voiceLibrary.ts";
+import { api } from "./api.ts";
 import { canvas } from "./canvas.ts";
 import { canvasShell } from "./canvasShell.ts";
 import { canvasWorkspace } from "./canvasWorkspace.ts";
@@ -19,6 +22,9 @@ export const ptBR: Record<keyof typeof enUS, MessageEntry> = {
   ...library,
   ...assistant,
   ...generation,
+  ...trace,
+  ...voiceLibrary,
+  ...api,
   ...canvas,
   ...canvasShell,
   ...canvasWorkspace,
