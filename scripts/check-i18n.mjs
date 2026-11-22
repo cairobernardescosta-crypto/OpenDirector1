@@ -54,11 +54,19 @@ function keysOf(text) {
 
 const zhDir = join(catalogRoot, "zh-CN");
 const enDir = join(catalogRoot, "en-US");
+const ptIndex = join(catalogRoot, "pt-BR", "index.ts");
 const zhFiles = (await readdir(zhDir)).filter((name) => name.endsWith(".ts"));
 const enFiles = new Set(
   (await readdir(enDir)).filter((name) => name.endsWith(".ts")),
 );
 const problems = [];
+try {
+  const pt = await readFile(ptIndex, "utf8");
+  if (!pt.includes("export const ptBR") || !pt.includes("...enUS"))
+    problems.push("pt-BR must preserve the complete canonical key set with explicit fallback");
+} catch {
+  problems.push("pt-BR catalog index is missing");
+}
 let keyCount = 0;
 
 for (const file of zhFiles) {
