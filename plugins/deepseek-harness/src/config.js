@@ -1,7 +1,7 @@
 import { ConfigError } from './errors.js'
 
 export const DEFAULT_BASE_URL = 'http://127.0.0.1:8000'
-export const SUPPORTED_LOCALES = ['en-US', 'zh-CN']
+export const SUPPORTED_LOCALES = ['en-US', 'zh-CN', 'pt-BR']
 
 export function normalizeUrl(value, field) {
   const raw = typeof value === 'string' ? value.trim() : ''
