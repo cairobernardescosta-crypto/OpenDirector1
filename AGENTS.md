@@ -176,3 +176,14 @@ This section supplements the upstream OpenDirector guidance above and applies to
 - **Regression and data protection:** Keep existing UI, canvas, editing, generation, models, integration settings, project persistence and exports working. Before risky changes, identify compatibility impacts and a rollback point. Never overwrite credentials, user projects or local data.
 - **History and backups:** Prefer focused, descriptive commits and avoid commit noise. Keep one principal deployed/local version plus one backup under the user's operating workflow; do not delete backups or change local installations through repository-only work.
 - **Release control:** Merging `dev` into `main`, tagging or publishing releases, and updating the Windows installation require explicit owner approval. See regression checklist for optional, risk-adjusted verification.
+
+## Permanent extension policy — cards, node creation and canvas connections
+
+For **every future request** to add a card function, a node type, a `New node` menu item, a connection or a multi-card workflow, read and apply [PPC 3.0 § 5.2](docs/PPC.md) and the [regression protection matrix](docs/REGRESSION-PROTECTION.md) **before editing**. This is an architectural requirement, not a claim that those features exist or that a test has passed.
+
+- Preserve native `CanvasNode`/`CanvasEdge` semantics, existing reference and assembly intents, history, stable IDs, saved projects, agent behavior and UI. Canvas edges describe references, **not automatic sequential execution**.
+- Prefer attaching new behavior to an existing node kind; only extend domain types after mapping all dependent schemas, serializers, backend commands, UI projections, ports, policies, execution paths and tests.
+- Use `CanvasCreationMenu`/`creationTools` for presentation and `connectionPolicy`/`selectionReferences` for shared capability checks. Never bypass a rejected connection or alter unrelated native capabilities to show a menu option.
+- Reuse atomic commands, service authorization, execution receipts and idempotent recovery; allow independent cards where legitimate and explicit workflows where orchestration is requested.
+- Introduce UI/agent/backend integration consistently, with locale presentation for Chinese, English and the fork's Brazilian Portuguese. Keep business identifiers language-neutral.
+- Follow the seven phased implementation plan in PPC § 5.2; only claim functionality or validation shown by evidence. PPC 3.0 validation remains **owner-discretionary**: no mandatory per-change tests, CI, GitHub Actions, automatic merges or Windows updates.
