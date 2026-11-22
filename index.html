@@ -29,14 +29,19 @@
         const saved = localStorage.getItem(key);
         const language = navigator.languages?.[0] ?? navigator.language ?? "";
         const locale =
-          saved === "en-US" || saved === "zh-CN"
+          saved === "en-US" || saved === "zh-CN" || saved === "pt-BR"
             ? saved
             : /^zh\b/i.test(language)
               ? "zh-CN"
-              : "en-US";
+              : /^pt\b/i.test(language)
+                ? "pt-BR"
+                : "en-US";
         document.documentElement.lang = locale;
         document.documentElement.dataset.locale = locale;
-        if (locale === "en-US") {
+        if (locale === "pt-BR") {
+          document.title = "OpenDirector · Área de criação";
+          document.querySelector('meta[name="description"]')?.setAttribute("content", "Área de criação local para organizar arquivos, editar imagens, montar linhas do tempo e visualizar cenas.");
+        } else if (locale === "en-US") {
           document.title = "OpenDirector · Creation Canvas";
           document
             .querySelector('meta[name="description"]')
