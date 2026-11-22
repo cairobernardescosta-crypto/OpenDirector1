@@ -45,7 +45,7 @@ function trusted(event) {
   return event.sender === window?.webContents && event.senderFrame === window.webContents.mainFrame && ownedURL(event.senderFrame.url);
 }
 ipcMain.on('desktop:locale', (event, value) => {
-  if (!trusted(event) || !['en-US', 'zh-CN'].includes(value)) return;
+  if (!trusted(event) || !['en-US', 'zh-CN', 'pt-BR'].includes(value)) return;
   locale = value;
   writeFileSync(join(userData, 'locale'), value, { mode: 0o600 });
   menu();
