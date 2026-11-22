@@ -70,3 +70,15 @@ test("an invalid saved value falls back to browser detection", () => {
     restore();
   }
 });
+
+test("Portuguese browser languages select pt-BR and preserve explicit choices", () => {
+  let restore = withBrowser(["pt-BR"]);
+  try { assert.equal(detectLocale(), "pt-BR"); }
+  finally { restore(); }
+  restore = withBrowser(["pt-PT"]);
+  try { assert.equal(detectLocale(), "pt-BR"); }
+  finally { restore(); }
+  restore = withBrowser(["zh-CN"], "pt-BR");
+  try { assert.equal(detectLocale(), "pt-BR"); }
+  finally { restore(); }
+});
