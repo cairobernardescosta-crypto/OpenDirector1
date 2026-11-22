@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
 from opendirector.application.library import Library
+from opendirector.application.library_collections import LibraryCollections
 from opendirector.application.subject_library import SubjectLibrary
 from opendirector.application.canvas_sources import CanvasSources
 from opendirector.media import thumbnails
@@ -23,6 +24,10 @@ MEDIA_CACHE = 'private, max-age=31536000, immutable'
 
 class LibrarySelection(BaseModel):
     itemIds: list[UUID] = Field(min_length=1, max_length=1000)
+
+
+class CollectionItems(BaseModel):
+    itemIds: list[UUID] = Field(default_factory=list, max_length=100000)
 
 
 class LibraryRename(BaseModel):
@@ -76,6 +81,7 @@ class SubjectMediaPreparation(BaseModel):
 def library_routes(projects):
     router = APIRouter(prefix='/api/library', tags=['Global asset library'])
     library = Library(projects)
+    collections = LibraryCollections(projects)
     subjects = SubjectLibrary(projects)
     sources = CanvasSources(projects)
 
@@ -130,6 +136,27 @@ def library_routes(projects):
     def subject_media(item_id: UUID, slot: str, revision: int = Query(ge=1)):
         data, mime = subjects.media(item_id, slot, revision)
         return Response(data, media_type=mime, headers={'Cache-Control': 'no-store'})
+
+    # Named collections are independent metadata; removing one never removes a blob.
+    @router.get('/collections')
+    def list_collections():
+        return collections.list()
+
+    @router.post('/collections', status_code=201)
+    async def create_collection(value: LibraryRename):
+        return await run_in_threadpool(collections.create, value.name)
+
+    @router.patch('/collections/{collection_id}')
+    async def rename_collection(collection_id: UUID, value: LibraryRename):
+        return await run_in_threadpool(collections.rename, collection_id, value.name)
+
+    @router.put('/collections/{collection_id}/items')
+    async def set_collection_items(collection_id: UUID, value: CollectionItems):
+        return await run_in_threadpool(collections.set_items, collection_id, value.itemIds)
+
+    @router.delete('/collections/{collection_id}')
+    async def delete_collection(collection_id: UUID):
+        return await run_in_threadpool(collections.delete, collection_id)
 
     @router.get('/items')
     def list_items(
