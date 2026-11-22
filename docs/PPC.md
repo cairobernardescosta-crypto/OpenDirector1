@@ -50,6 +50,43 @@ Preservar código, funcionalidades e dados enquanto o fork evolui, evitando regr
 
 **Ordem obrigatória de implementação:** localizar no código → reutilizar → estender/compor → criar nativamente apenas se faltar → registrar mudanças e validação realmente executada (quando solicitada). Esta regra vale para agentes de IA e desenvolvimento manual e não altera a política de validação livre.
 
+
+## 5.2. Regra permanente — extensões de cards, conexões e funções
+
+Esta seção se aplica **automaticamente a todo pedido futuro** que acrescente ou altere funções de cards, menus `Novo nó`, conectores, referências, agentes, fluxos e execução. Complementa a arquitetura do `AGENTS.md` sem substituir as regras do OpenDirector.
+
+### Contrato nativo a preservar
+
+1. **Distinguir conceitos:** o tipo de nó (`CanvasNodeKind`), a função/ação configurada, o conteúdo e a execução são responsabilidades diferentes. Preferir **compor uma função sobre um nó nativo compatível** a criar novo tipo de nó; criar tipo novo somente quando o domínio exigir e quando toda a cadeia suportar o contrato.
+2. **Referência não é automação:** linhas `CanvasEdge` com `generation_input`, `assembly_input` ou `post_edit_result` não significam, por si só, execução em sequência. Orquestração de etapas deve ter **semântica e estado próprios**, reutilizar os serviços nativos e não reinterpretar linhas existentes.
+3. **Identidades e dados:** não renomear/remapear IDs públicos, tipos, `intent`, `referenceBinding`, versões, handles, assets, modelos, credenciais nem dados persistidos para facilitar uma UI. Novos metadados devem ser compatíveis com documentos antigos, com leitura segura e sem migração destrutiva.
+4. **Menu e conexões:** não liberar uma opção só alterando o menu ou removendo `disabled`. Toda possibilidade nova deve passar pela mesma matriz compartilhada em `connectionPolicy.ts`, `referenceIssue()`, `connectedCreationKinds()` e `planReferenceBatch()`; preservar bloqueios, capacidade, material de origem, duplicidade, direção, referências fixadas e montagem especial.
+5. **Operação atômica:** criar nó + conexões em um único comando em lote quando pertinente; se a validação rejeitar uma parte, não publicar cards órfãos, arestas parciais nem duplicar resultados. Manter undo/redo, cópia/cola, seleção, arraste, reconexão, ocultação, grupos e persistência.
+6. **Execução legítima:** cards opcionais podem executar isoladamente quando seus pré-requisitos reais permitirem. Ausência de card obrigatório não deve causar falha artificial; ausência de conteúdo, modelo, permissão ou input **de fato necessário** deve produzir explicação adequada. Um card de texto não precisa gerar imagem ou vídeo. Não simular execução, registrar êxito sem recibo nem consumir créditos inesperadamente.
+7. **Agente/UI/backend:** a mesma função usa os mesmos contratos de negócio, validação, locks, permissões, identidade da tarefa, falhas, recuperação e resultados; não criar automação exclusiva do frontend nem endpoints paralelos por conveniência.
+8. **Experiência original:** preservar visual, portas, geometria, acessibilidade, atalhos, estados de arraste, ícones e cores nativos. Adicionar nomes/textos em `zh-CN`, `en-US` e `pt-BR` (permitir fallback inglês temporário onde o fork ainda não está totalmente traduzido); nunca traduzir IDs.
+9. **Preservar sem esconder problemas:** não apagar caminhos de criação existentes, reduzir matriz de compatibilidade, desativar ferramentas atuais ou modificar projetos antigos para acomodar uma função nova. Se houver incompatibilidade real, registrar o risco e propor alternativa sem regressão.
+
+### Caminho de implementação (fases de referência, não conclusão declarada)
+
+1. **Mapear contrato existente:** seguir a interação da porta/linha ao menu, política, comando, persistência e execução; levantar entradas e saídas existentes, consumidores UI/agente e testes relevantes.
+2. **Catálogo/registro de funções:** definir identificadores estáveis, rótulos, categoria, ícone, parâmetros, capacidades e tipos de entrada/saída; reutilizar registros e componentes nativos antes de adicionar estruturas novas.
+3. **Ampliar `Novo nó` sem regressão:** manter opções e ordem nativas; acrescentar funções/categorias de modo progressivo, respeitando a matriz de referência e estados indisponíveis.
+4. **Configurar cada função:** reutilizar o modelo de configurações para agente, LLM, prompts, entradas, saídas e validação, sem acoplamento a um único provedor.
+5. **Executar isolado ou encadeado:** separar conexão de material de dependência de execução; permitir cards independentes e cadeias explícitas; controlar ordem, cancelamento, repetição, falha e idempotência pelos serviços já existentes.
+6. **Persistir e preservar:** confirmar contratos de serialização, projetos antigos, links, assets, undo/redo, cópia/cola, importação/exportação, reabertura e histórico, sem migração destrutiva.
+7. **Validar regressões conforme decisão do proprietário:** verificar matriz, ciclos, bloqueios, origem vazia, múltiplas fontes, limites, falha intermediária e execução real pela UI e pelo agente. Testes/build são opcionais sob PPC 3.0; registrar `não executado` até ocorrerem.
+
+### Arquivos nativos de referência
+
+- Exibição da linha/portas: `src/canvas/CanvasConnections.tsx`, `src/canvas/connectionPorts.ts`, `src/canvas/useCanvasReferences.ts`.
+- Menu/catálogo: `src/canvas/CanvasCreationMenu.tsx`, `src/canvas/creationTools.ts`, `src/canvas/workspace/WorkspaceView.tsx`.
+- Política/validação: `src/canvas/connectionPolicy.ts`, `src/canvas/selectionReferences.ts`.
+- Comandos/estado: `src/canvas/model.ts`, `src/canvas/workspace/useWorkspaceInteraction.tsx`, `src/canvas/workspaceInteraction.ts`.
+- Testes existentes para consultar quando apropriado: `tests/referenceSystem.test.ts`, `tests/nodeReferencePorts.test.ts`, `tests/browser/node_connections.mjs`, `tests/browser/reference_reconnect.mjs`.
+
+**Aplicação a novos pedidos:** ao receber “adicione uma função/card”, o agente deve partir desta seção, identificar o contrato mínimo, a implementação e o risco de regressão, e somente então editar os pontos necessários. A regra é permanente, mas **não garante por si só ausência de bugs** e não cria testes obrigatórios, automação, release ou atualização local.
+
 ## 6. Fluxo GitHub ↔ Windows
 - Código alterado diretamente no GitHub por API; GitHub não atualiza automaticamente o Windows.
 - **Sem GitHub Actions**, implantação automática, sincronização automática ou acesso implícito à instalação local.
