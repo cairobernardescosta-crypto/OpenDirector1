@@ -11,6 +11,18 @@ export const messages = {
     collision: 'This path is already in use. To repair a previous OpenDirector installation, inspect and manually remove its old entry before installing again.',
     failed: 'Operation failed', close: 'Close', save: 'Save file',
   },
+  'pt-BR': {
+    app: 'OpenDirector', startup: 'Não foi possível iniciar o OpenDirector', retry: 'Tentar novamente', quit: 'Sair', cancel: 'Cancelar',
+    interrupted: 'O serviço local parou. Reinicie o OpenDirector para reconectar. As tarefas remotas não são canceladas automaticamente.',
+    running: 'Há trabalhos do agente, geração ou exportação em andamento, ou não foi possível confirmar o status. Sair interrompe tarefas locais. Tarefas remotas podem continuar e gerar custos. Sair agora?',
+    edit: 'Editar', view: 'Exibir', undo: 'Desfazer', redo: 'Refazer', cut: 'Recortar', copy: 'Copiar', paste: 'Colar', selectAll: 'Selecionar tudo', fullscreen: 'Alternar tela cheia', devtools: 'Ferramentas de desenvolvedor',
+    menu: 'Arquivo', logs: 'Abrir pasta de diagnósticos', data: 'Abrir pasta de dados', command: 'Gerenciar comando do terminal',
+    install: 'Instalar', remove: 'Instruções de remoção', commandDone: 'Comando do terminal instalado. Abra um novo terminal para utilizá-lo.',
+    commandAlreadyInstalled: 'O comando do terminal já está instalado.',
+    commandRemoveHelp: 'Para desinstalar o comando, verifique o item neste caminho e remova-o manualmente caso pertença ao OpenDirector.',
+    collision: 'Este caminho já está em uso. Para reparar uma instalação anterior do OpenDirector, verifique e remova manualmente o item antigo antes de reinstalar.',
+    failed: 'Operação falhou', close: 'Fechar', save: 'Salvar arquivo',
+  },
   'zh-CN': {
     app: 'OpenDirector', startup: 'OpenDirector 无法启动', retry: '重试', quit: '退出', cancel: '取消',
     interrupted: '本地服务已停止，请重启 OpenDirector 重新连接。已有远端任务不会自动取消。',
@@ -24,4 +36,4 @@ export const messages = {
     failed: '操作失败', close: '关闭', save: '保存文件',
   },
 };
-export const localeFor = value => value?.startsWith('zh') ? 'zh-CN' : 'en-US';
+export const localeFor = value => value?.startsWith('zh') ? 'zh-CN' : value?.startsWith('pt') ? 'pt-BR' : 'en-US';
