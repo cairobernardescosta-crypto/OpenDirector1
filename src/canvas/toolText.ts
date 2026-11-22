@@ -245,7 +245,7 @@ const EN: Record<string, string> = {
 };
 
 export function translateToolText(locale: Locale, value: string): string {
-  return locale === "en-US" ? (EN[value] ?? value) : value;
+  return locale === "zh-CN" ? value : (EN[value] ?? value);
 }
 
 function translateField(locale: Locale, field: ToolField): ToolField {
