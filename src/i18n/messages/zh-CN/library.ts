@@ -1,5 +1,16 @@
 /** Asset library, subject library, canvas sources and trash. */
 export const library = {
+ "library.collections.all": "所有素材",
+ "library.collections.label": "素材集合",
+ "library.collections.new": "新建集合",
+ "library.collections.name": "集合名称",
+ "library.collections.create": "创建",
+ "library.collections.add": "加入所选素材",
+ "library.collections.remove": "移除所选素材",
+ "library.collections.delete": "删除集合",
+ "library.collections.deleted": "集合已删除，素材保留。",
+ "library.collections.saved": "集合已更新。",
+ "library.collections.created": "集合已创建。",
   "library.title": "资产库",
   "library.sections": "资产库分区",
   "library.tab.assets": "资产",
