@@ -37,7 +37,7 @@ function interpolate(template: string, params?: MessageParams): string {
 }
 
 function entryFor(locale: Locale, key: string): MessageEntry | undefined {
-  return catalogs[locale][key] ?? (locale === "pt-BR" ? enUS[key] : undefined) ?? catalogs[DEFAULT_LOCALE][key];
+  return catalogs[locale][key] ?? catalogs[DEFAULT_LOCALE][key];
 }
 
 export function hasMessage(key: string): key is MessageKey {
