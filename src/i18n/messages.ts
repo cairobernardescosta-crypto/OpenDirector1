@@ -1,5 +1,6 @@
 /** Pure message lookup used by React and non-React modules. */
 import { enUS } from "./messages/en-US/index.ts";
+import { ptBR } from "./messages/pt-BR/index.ts";
 import { zhCN } from "./messages/zh-CN/index.ts";
 import { DEFAULT_LOCALE } from "./locale.ts";
 import type {
@@ -15,6 +16,7 @@ export type { Locale, MessageDescriptor, MessageKey, MessageParams } from "./typ
 export const catalogs: Record<Locale, Record<string, MessageEntry>> = {
   "zh-CN": zhCN,
   "en-US": enUS,
+  "pt-BR": ptBR,
 };
 
 let activeLocale: Locale = DEFAULT_LOCALE;
@@ -35,7 +37,7 @@ function interpolate(template: string, params?: MessageParams): string {
 }
 
 function entryFor(locale: Locale, key: string): MessageEntry | undefined {
-  return catalogs[locale][key] ?? catalogs[DEFAULT_LOCALE][key];
+  return catalogs[locale][key] ?? (locale === "pt-BR" ? enUS[key] : undefined) ?? catalogs[DEFAULT_LOCALE][key];
 }
 
 export function hasMessage(key: string): key is MessageKey {
