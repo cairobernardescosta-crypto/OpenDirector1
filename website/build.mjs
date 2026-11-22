@@ -8,6 +8,7 @@ const repository = "https://github.com/ThinkFlowLab/OpenDirector";
 const pages = {
   "en-US": { path: "en/", hreflang: "en" },
   "zh-CN": { path: "zh-cn/", hreflang: "zh-CN" },
+  "pt-BR": { path: "pt-br/", hreflang: "pt-BR" },
 };
 
 const alternates = [
@@ -57,6 +58,7 @@ export function renderDownloadPage(template, installers, locale = "en-US") {
     siteRoot: "../",
     englishHref: `../${pages["en-US"].path}`,
     chineseHref: `../${pages["zh-CN"].path}`,
+    portugueseHref: `../${pages["pt-BR"].path}`,
     canonical: siteUrl + page.path,
     ogLocale: locale.replace("-", "_"),
     shareImage: `${siteUrl}canvas.jpg`,
@@ -65,7 +67,8 @@ export function renderDownloadPage(template, installers, locale = "en-US") {
   };
   const html = {
     alternates,
-    englishCurrent: chinese ? "" : ' aria-current="page"',
+    englishCurrent: locale === "en-US" ? ' aria-current="page"' : "",
+    portugueseCurrent: locale === "pt-BR" ? ' aria-current="page"' : "",
     chineseCurrent: chinese ? ' aria-current="page"' : "",
     primaryHidden: notes.size ? " hidden" : "",
     menuHidden: notes.size ? "" : " hidden",
@@ -91,8 +94,10 @@ if (import.meta.main) {
     canonical: siteUrl,
     englishHref: `./${pages["en-US"].path}`,
     chineseHref: `./${pages["zh-CN"].path}`,
+    portugueseHref: `./${pages["pt-BR"].path}`,
     englishLanguage: messages["en-US"].language,
     chineseLanguage: messages["zh-CN"].language,
+    portugueseLanguage: messages["pt-BR"].language,
   }, { alternates }));
   const urls = Object.values(pages).map(({ path }) => `  <url><loc>${siteUrl}${path}</loc></url>`);
   await writeFile(join(output, "sitemap.xml"), [
