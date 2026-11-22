@@ -5,7 +5,7 @@ export const LOCALE_KEY = "opendirector.locale.v1";
 export const DEFAULT_LOCALE: Locale = "zh-CN";
 
 export function isLocale(value: unknown): value is Locale {
-  return value === "zh-CN" || value === "en-US";
+  return value === "zh-CN" || value === "en-US" || value === "pt-BR";
 }
 
 function browserLanguage(): string {
@@ -21,7 +21,7 @@ export function detectLocale(): Locale {
   } catch {
     // Private mode can reject storage; detection still works.
   }
-  return /^zh\b/i.test(browserLanguage()) ? "zh-CN" : "en-US";
+  return /^zh\b/i.test(browserLanguage()) ? "zh-CN" : /^pt\b/i.test(browserLanguage()) ? "pt-BR" : "en-US";
 }
 
 export function writeLocale(locale: Locale): void {
