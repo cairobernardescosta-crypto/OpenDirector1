@@ -3,6 +3,7 @@ export const library = {
  "library.collections.all": "Todos os arquivos", "library.collections.browse": "Ver todos para adicionar",
 
  "library.collections.label": "Coleção",
+  "library.collections.actions": "Ações da coleção",
  "library.collections.new": "Nova coleção",
  "library.collections.name": "Nome da coleção",
  "library.collections.create": "Criar",
