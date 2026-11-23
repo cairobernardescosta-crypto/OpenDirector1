@@ -3,9 +3,10 @@ import type { CanvasActions } from "../CanvasActionsContext";
 import { CanvasIcon } from "../CanvasIcon";
 import { useT } from "../../i18n/I18nProvider";
 import { errorMessage } from "../../backend/api";
-import { listCollections, resolveCollection, type LibraryCollection, type LibraryCollectionResolution, type LibraryMediaKind } from "./libraryClient";
+import { listCollections, resolveCollection, type LibraryCollection, type LibraryCollectionResolution, type LibraryMediaKind, type LibraryItem } from "./libraryClient";
 import { encodeLibraryNode, type LibraryNodeState } from "./libraryNodeState";
 import { MediaCard } from "./MediaCard";
+import { LocalLibraryPreview } from "./LocalLibraryPreview";
 import "./local-library-node.css";
 
 /** Library card: the reference manifest is data, not a media generator.
@@ -30,6 +31,7 @@ export function LocalLibraryNode({
   const [mediaFilter, setMediaFilter] = useState<LibraryMediaKind | "">("");
   const [shown, setShown] = useState(12);
   const [refresh, setRefresh] = useState(0);
+  const [previewItem, setPreviewItem] = useState<LibraryItem | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -132,13 +134,30 @@ export function LocalLibraryNode({
                     ? { itemIds: [...state.itemIds, item.id].slice(0, 1000) }
                     : {}),
                 })}
-                action={state.activeItemId === item.id && !locked ? (
-                  <button type="button" className="cw-local-library-extract nodrag nopan"
-                    title={t("library.node.extract")}
-                    aria-label={t("library.node.extract")}
-                    onClick={(event) => { event.preventDefault(); event.stopPropagation(); actions?.insertLibraryItem?.(item); }}>
-                    <CanvasIcon name="plus" size={13}/>
-                  </button>
+                action={state.activeItemId === item.id ? (
+                  <>
+                    <button type="button" className="cw-local-library-extract cw-local-library-view nodrag nopan"
+                      title={t("library.node.view")} aria-label={t("library.node.view")}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setPreviewItem(item);
+                      }}>
+                      <CanvasIcon name="preview" size={13}/>
+                    </button>
+                    {!locked && (
+                      <button type="button" className="cw-local-library-extract nodrag nopan"
+                        title={t("library.node.extract")}
+                        aria-label={t("library.node.extract")}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          actions?.insertLibraryItem?.(item);
+                        }}>
+                        <CanvasIcon name="plus" size={13}/>
+                      </button>
+                    )}
+                  </>
                 ) : undefined}
                 onSelect={() => change({
                   itemIds: state.itemIds.includes(item.id)
@@ -166,6 +185,9 @@ export function LocalLibraryNode({
         <CanvasIcon name="rail-folder" size={13}/>
         {t("library.node.readOnly")}
       </p>
+      {previewItem && (
+        <LocalLibraryPreview item={previewItem} onClose={() => setPreviewItem(null)}/>
+      )}
     </div>
   );
 }
