@@ -142,6 +142,10 @@ def library_routes(projects):
     def list_collections():
         return collections.list()
 
+    @router.get('/collections/{collection_id}/resolve')
+    async def resolve_collection(collection_id: UUID):
+        return await run_in_threadpool(collections.resolve, collection_id)
+
     @router.post('/collections', status_code=201)
     async def create_collection(value: LibraryRename):
         return await run_in_threadpool(collections.create, value.name)
