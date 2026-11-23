@@ -5,6 +5,7 @@ import { errorMessage } from "../../backend/api.ts";
 import { CanvasContextMenu } from "../CanvasContextMenu";
 import { CanvasIcon } from "../CanvasIcon";
 import { canStartReference, connectedCreationKinds, referenceIssueText, referenceMaterial } from "../connectionPolicy";
+import { isLibraryNodeText } from "../library/libraryNodeState.ts";
 import { referencePortMetrics } from "../connectionPorts";
 import { batchCreationKinds, multiSelectionGeometry, planReferenceBatch, sourceReferencePreviews } from "../selectionReferences";
 import { toolProvenanceEdges } from "../generationHistory";
@@ -229,6 +230,10 @@ export function useWorkspaceInteraction(rt: WorkspaceRuntime) {
       ...extra,
     });
     if (kind === "timeline") node.width = 720;
+    if (kind === "text" && isLibraryNodeText(node.data.text)) {
+      node.width = 380;
+      node.height = 360;
+    }
     const parent = menu?.parentId
       ? current.nodes.find((candidate) => candidate.id === menu.parentId)
       : undefined;
