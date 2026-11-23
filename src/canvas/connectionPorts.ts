@@ -1,4 +1,5 @@
 import { canSourceReference } from "./connectionPolicy.ts";
+import { isLibraryNodeText } from "./library/libraryNodeState.ts";
 import type { CanvasNode, Point, Rect } from "./model.ts";
 
 export type PortSide = "top" | "right" | "bottom" | "left";
@@ -18,6 +19,7 @@ export function referencePortDirection(
   node: CanvasNode | undefined,
 ): ReferencePortDirection {
   if (!node) return "both";
+  if (node.type === "text" && isLibraryNodeText(node.data.text)) return "out";
   if (node.data.mediaRole === "asset") return "out";
   return canSourceReference(node) ? "both" : "in";
 }
