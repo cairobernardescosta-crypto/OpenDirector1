@@ -11,6 +11,7 @@ import {
 import { tNow } from "../i18n/messages.ts";
 import type { MessageKey } from "../i18n/types.ts";
 import { assemblyIssue, isAssemblyTarget } from "./editorAssembly.ts";
+import { isLibraryNodeText } from "./library/libraryNodeState.ts";
 
 /** Product port capabilities; model-specific input limits remain separate. */
 export function nodePorts(kind: CanvasNodeKind) {
@@ -40,6 +41,8 @@ export function nodeDownstreamKinds(
 }
 
 export function referenceMaterial(node: CanvasNode): string | null {
+  // A serialized library manifest is not an instruction or media input.
+  if (node.type === "text" && isLibraryNodeText(node.data.text)) return null;
   if (node.data.assetState === "missing") return null;
   if (node.type === "text")
     return node.data.text?.trim() ? node.data.text : null;
@@ -65,6 +68,7 @@ export function referenceMaterial(node: CanvasNode): string | null {
 
 /** Empty generation nodes keep their ports; assets need readable material. */
 export function canStartReference(node: CanvasNode): boolean {
+  if (node.type === "text" && isLibraryNodeText(node.data.text)) return false;
   return (
     Boolean(nodeDownstreamKinds(node).length) &&
     (node.data.mediaRole !== "asset" || Boolean(referenceMaterial(node)))
@@ -187,6 +191,10 @@ export function referenceIssue(
   const a = nodes.find((n) => n.id === source),
     b = nodes.find((n) => n.id === target);
   if (!a || !b) return "endpoint_missing";
+  // The local-library editor is not yet a generation-media endpoint.
+  if ((a.type === "text" && isLibraryNodeText(a.data.text)) ||
+      (b.type === "text" && isLibraryNodeText(b.data.text)))
+    return "source_type_unsupported";
   if (intent !== "post_edit_result" && isAssemblyTarget(b))
     intent = "assembly_input";
   else if (intent === "assembly_input") return "target_type_unsupported";
