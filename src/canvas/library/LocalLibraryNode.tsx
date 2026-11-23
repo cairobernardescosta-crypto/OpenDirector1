@@ -70,7 +70,7 @@ export function LocalLibraryNode({
       <label className="cw-local-library-line">
         <span>{t("library.node.collection")}</span>
         <select value={state.collectionId} disabled={locked || busy}
-          onChange={(event) => change({ collectionId: event.target.value, itemIds: [] })}>
+          onChange={(event) => change({ collectionId: event.target.value, itemIds: [], activeItemId: undefined })}>
           <option value="">{t("library.node.choose")}</option>
           {collections.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}
           {state.collectionId && !current &&
@@ -124,7 +124,16 @@ export function LocalLibraryNode({
                 item={item.mediaKind === "image" || item.mediaKind === "video" || item.mediaKind === "audio" ? item : undefined}
                 icon={item.mediaKind ?? "file"}
                 selectable={state.mode === "fixed" && !locked}
-                selected={state.itemIds.includes(item.id)}
+                selected={state.mode === "fixed" ? state.itemIds.includes(item.id) : state.activeItemId === item.id}
+                onOpen={() => change({ activeItemId: item.id })}
+                action={state.activeItemId === item.id && !locked ? (
+                  <button type="button" className="cw-local-library-extract nodrag nopan"
+                    title={t("library.node.extract")}
+                    aria-label={t("library.node.extract")}
+                    onClick={(event) => { event.preventDefault(); event.stopPropagation(); actions?.insertLibraryItem?.(item); }}>
+                    <CanvasIcon name="plus" size={13}/>
+                  </button>
+                ) : undefined}
                 onSelect={() => change({
                   itemIds: state.itemIds.includes(item.id)
                     ? state.itemIds.filter((id) => id !== item.id)
@@ -133,6 +142,9 @@ export function LocalLibraryNode({
               />
             ))}
           </div>
+          {state.activeItemId && (
+            <p className="cw-local-library-hint">{t("library.node.active")}</p>
+          )}
           {matching.length > shown && (
             <button className="cw-local-library-more" type="button"
               onClick={() => setShown((value) => value + 24)}>
