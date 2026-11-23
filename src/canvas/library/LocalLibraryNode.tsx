@@ -125,7 +125,12 @@ export function LocalLibraryNode({
                 icon={item.mediaKind ?? "file"}
                 selectable={state.mode === "fixed" && !locked}
                 selected={state.mode === "fixed" ? state.itemIds.includes(item.id) : state.activeItemId === item.id}
-                onOpen={() => change({ activeItemId: item.id })}
+                onOpen={() => change({
+                  activeItemId: item.id,
+                  ...(state.mode === "fixed" && !state.itemIds.includes(item.id)
+                    ? { itemIds: [...state.itemIds, item.id].slice(0, 1000) }
+                    : {}),
+                })}
                 action={state.activeItemId === item.id && !locked ? (
                   <button type="button" className="cw-local-library-extract nodrag nopan"
                     title={t("library.node.extract")}
@@ -143,7 +148,7 @@ export function LocalLibraryNode({
             ))}
           </div>
           {state.activeItemId && (
-            <p className="cw-local-library-hint">{t("library.node.active")}</p>
+            <p className="cw-local-library-hint">{t("library.node.active")}: {resolved.items.find((item) => item.id === state.activeItemId)?.name ?? t("library.node.unavailable")}</p>
           )}
           {matching.length > shown && (
             <button className="cw-local-library-more" type="button"
