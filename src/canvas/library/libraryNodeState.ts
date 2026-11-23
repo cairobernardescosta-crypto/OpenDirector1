@@ -12,6 +12,8 @@ export type LibraryNodeState = {
   collectionId: string;
   mode: "dynamic" | "fixed";
   itemIds: string[];
+  /** One explicit media item to export through a native canvas node. */
+  activeItemId?: string;
 };
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -31,12 +33,15 @@ export function parseLibraryNode(text?: string): LibraryNodeState | null {
         (state.mode !== "fixed" && state.mode !== "dynamic") ||
         !Array.isArray(state.itemIds) || state.itemIds.length > 1000 ||
         !state.itemIds.every((id) => typeof id === "string" && uuid.test(id)) ||
-        new Set(state.itemIds).size !== state.itemIds.length) return null;
+        new Set(state.itemIds).size !== state.itemIds.length ||
+        (state.activeItemId !== undefined &&
+          (typeof state.activeItemId !== "string" || !uuid.test(state.activeItemId)))) return null;
     return {
       version: 1,
       collectionId: state.collectionId,
       mode: state.mode,
       itemIds: [...state.itemIds],
+      ...(state.activeItemId !== undefined ? { activeItemId: state.activeItemId } : {}),
     };
   } catch {
     return null;
