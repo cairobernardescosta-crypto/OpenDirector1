@@ -580,6 +580,7 @@ export function useWorkspaceInteraction(rt: WorkspaceRuntime) {
     composerNode &&
     single?.id === composerNode.id &&
     ["text", "image", "video", "audio"].includes(composerNode.type) &&
+    !(composerNode.type === "text" && isLibraryNodeText(composerNode.data.text)) &&
     (composerNode.type === "text" || composerNode.data.mediaRole !== "asset") &&
     composerNode.id !== dismissedComposer &&
     !lockedIds.has(composerNode.id),
