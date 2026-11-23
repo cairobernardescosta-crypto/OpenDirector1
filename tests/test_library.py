@@ -253,6 +253,17 @@ def test_collections_reference_media_without_copying_or_deleting(client, tmp_pat
     assert sorted(p.name for p in (tmp_path / '.opendirector' / 'library' / 'blobs').iterdir()) == before
     assert len(client.get('/api/library/collections').json()) == 1
 
+    # Renaming changes collection metadata, never membership or backing blobs.
+    renamed = client.patch(
+        f'/api/library/collections/{collection_id}',
+        json={'name': 'Cairo'},
+    )
+    assert renamed.status_code == 200, renamed.text
+    assert renamed.json()['name'] == 'Cairo'
+    assert renamed.json()['itemIds'] == [photo['id'], song['id']]
+    assert [row['name'] for row in client.get('/api/library/collections').json()] == ['Cairo']
+    assert sorted(p.name for p in (tmp_path / '.opendirector' / 'library' / 'blobs').iterdir()) == before
+
     deleted = client.delete(f'/api/library/collections/{collection_id}')
     assert deleted.status_code == 200
     assert deleted.json()['assetsDeleted'] == 0
