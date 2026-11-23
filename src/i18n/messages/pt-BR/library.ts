@@ -4,6 +4,7 @@ export const library = {
 
  "library.collections.label": "Coleção",
   "library.collections.actions": "Ações da coleção",
+  "library.collections.unavailable": "Coleção não encontrada. Os arquivos enviados continuam disponíveis em Todos os arquivos.",
  "library.collections.new": "Nova coleção",
  "library.collections.name": "Nome da coleção",
  "library.collections.create": "Criar",
