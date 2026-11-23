@@ -4,7 +4,7 @@ import { Background, BackgroundVariant, MiniMap, SelectionMode, ViewportPortal }
 
 import "@xyflow/react/dist/style.css";
 import { Suspense, useEffect, useRef, useState, type CSSProperties } from "react";
-import { createNode } from "../model.ts";
+import { createNode, nextNodeTitle } from "../model.ts";
 import { NodeVersionHistory } from "../NodeVersionHistory";
 
 import openDirectorLogoAnimation from "../../assets/open_director_logo_anim.gif";
@@ -1124,7 +1124,7 @@ export function WorkspaceView({ rt }: { rt: WorkspaceRuntime }) {
             label: t("library.node.title"),
             actionLabel: t("canvas.rail.add", { label: t("library.node.title") }),
             onClick: () => addNode("text", undefined, {
-              title: t("library.node.title"),
+              title: nextNodeTitle(doc, "text", t("library.node.title")),
               text: encodeLibraryNode({ version: 1, collectionId: "", mode: "dynamic", itemIds: [] }),
             }),
           },
@@ -1938,7 +1938,7 @@ export function WorkspaceView({ rt }: { rt: WorkspaceRuntime }) {
           canRedo={businessHistory.redo && !historyReplaying}
           onCreate={(kind) => addNode(kind, menu.world)}
           onCreateLibrary={() => addNode("text", menu.world, {
-            title: t("library.node.title"),
+            title: nextNodeTitle(doc, "text", t("library.node.title")),
             text: encodeLibraryNode({ version: 1, collectionId: "", mode: "dynamic", itemIds: [] }),
           })}
           onAssets={() => {
