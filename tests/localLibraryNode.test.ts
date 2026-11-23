@@ -4,6 +4,8 @@ import { applyCommand, createDocument, createNode } from "../src/canvas/model.ts
 import { parseDocument, serializeDocument } from "../src/canvas/storage.ts";
 import { canStartReference, canSourceReference, referenceMaterial, referenceIssue } from "../src/canvas/connectionPolicy.ts";
 import { referencePortDirection } from "../src/canvas/connectionPorts.ts";
+import { assistantReferences } from "../src/canvas/assistantReferences.ts";
+import { pendingCanvasReferences } from "../src/canvas/pendingCanvasReferences.ts";
 import { encodeLibraryNode, isLibraryNodeText, parseLibraryNode, libraryCreationKinds } from "../src/canvas/library/libraryNodeState.ts";
 
 const collectionId = "11111111-1111-4111-8111-111111111111";
@@ -85,4 +87,12 @@ test("library manifests cannot connect, but imported native material can", () =>
   const doc = { ...createDocument(), nodes: [library, target, native] };
   assert.equal(referenceIssue(doc, library.id, target.id), "source_type_unsupported");
   assert.equal(referenceIssue(doc, native.id, target.id), null);
+});
+
+test("assistant selection cannot read a library manifest as a Gemini prompt", () => {
+  const source = createNode("text", undefined, { text: encodeLibraryNode(initial) });
+  assert.deepEqual(assistantReferences([source]), []);
+  const [pending] = pendingCanvasReferences([source]);
+  assert.ok(pending?.error);
+  assert.deepEqual(pending?.identity.references, []);
 });
