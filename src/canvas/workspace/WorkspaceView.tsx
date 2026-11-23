@@ -62,7 +62,7 @@ import { arrangeNodes } from "../geometry";
 import { ImageActionEditor, isImageActionTool } from "../ImageActionEditor";
 import { ImageEditor } from "../ImageEditor";
 import { AssetLibraryDialog } from "../library/AssetLibraryDialog";
-import { encodeLibraryNode, isLibraryNodeText, parseLibraryNode } from "../library/libraryNodeState";
+import { encodeLibraryNode, isLibraryNodeText, parseLibraryNode, libraryCreationKinds } from "../library/libraryNodeState";
 import { resolveCollection } from "../library/libraryClient";
 import "../library/library.css";
 import { SubjectImportDialog } from "../library/SubjectImportDialog";
@@ -2082,7 +2082,9 @@ export function WorkspaceView({ rt }: { rt: WorkspaceRuntime }) {
               allowedKinds={
                 menu.connected && menu.connected.direction === "source" &&
                 isLibraryNodeText(doc.nodes.find((n) => n.id === menu.connected?.id)?.data.text)
-                  ? ["image", "video", "audio"]
+                  ? libraryCreationKinds(parseLibraryNode(
+                    doc.nodes.find((n) => n.id === menu.connected?.id)?.data.text,
+                  ))
                   : menu.connected
                   ? menu.connected.ids && menu.connected.ids.length > 1
                     ? batchCreationKinds(
