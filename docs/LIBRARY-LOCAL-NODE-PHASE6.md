@@ -44,6 +44,16 @@ Na branch `dev`, foram adicionadas as seguintes correções (ainda **não valida
 
 **Limite consciente:** a coleção permanece implementada como um card especializado sobre o contrato nativo de nó de texto, e não como um novo `CanvasKind` Python. O transporte das mídias funciona criando um nó nativo de imagem/vídeo/áudio/arquivo; conectar diretamente vários arquivos da coleção a uma única porta sem nós intermediários permanece pendente de uma migração de esquema mais profunda.
 
+## Fase 6.2 — correções do print de 22/11/2026
+
+- Removido o teto de `max-height: 250px` do conteúdo. O card acompanha a altura redimensionável e permite rolagem vertical de toda a grade, inclusive nomes e controles sob as miniaturas.
+- Miniaturas `object-fit: contain` para mostrar a imagem inteira, com grade responsiva e área escura para enquadramento.
+- Seleção de arquivo mostra botão para abrir imagem/vídeo/áudio em modal amplo, com leitura autenticada e `Escape` para sair. O modal é renderizado no `document.body`, fora do recorte do canvas.
+- Menu nativo de criação através de fio agora oferece **Biblioteca local**, mesmo quando `allowedKinds` restringe o menu. Ela é criada no ponto de soltura como nó de referência, sem forjar uma aresta inválida para/da configuração da coleção.
+- O vínculo efetivo com geradores continua pela extração/seleção de um arquivo individual para um nó nativo e conexão validada: a coleção não é mídia e não deve entrar como texto em prompts.
+
+**Verificação pendente:** executar testes, `npm run check:i18n`, `npm run build`, Python e inspeção visual local. Nada foi instalado no Windows por esta alteração.
+
 ## Portões de regressão antes de atualizar o Windows
 
 - `npm run check:i18n`, `npm test`, `npm run build`
