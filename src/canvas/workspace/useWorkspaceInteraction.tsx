@@ -5,7 +5,8 @@ import { errorMessage } from "../../backend/api.ts";
 import { CanvasContextMenu } from "../CanvasContextMenu";
 import { CanvasIcon } from "../CanvasIcon";
 import { canStartReference, connectedCreationKinds, referenceIssueText, referenceMaterial } from "../connectionPolicy";
-import { isLibraryNodeText } from "../library/libraryNodeState.ts";
+import { isLibraryNodeText, parseLibraryNode } from "../library/libraryNodeState.ts";
+import { resolveCollection, type LibraryItem } from "../library/libraryClient.ts";
 import { referencePortMetrics } from "../connectionPorts";
 import { batchCreationKinds, multiSelectionGeometry, planReferenceBatch, sourceReferencePreviews } from "../selectionReferences";
 import { toolProvenanceEdges } from "../generationHistory";
@@ -480,6 +481,33 @@ export function useWorkspaceInteraction(rt: WorkspaceRuntime) {
     world: (point) => flow.screenToFlowPosition(point),
     connect: (sources, target) => {
       const current = historyRef.current.present;
+      const source = sources.length === 1
+        ? current.nodes.find((node) => node.id === sources[0])
+        : undefined;
+      if (source?.type === "text" && isLibraryNodeText(source.data.text)) {
+        const state = parseLibraryNode(source.data.text);
+        if (!state?.collectionId || !state.activeItemId ||
+            (state.mode === "fixed" && !state.itemIds.includes(state.activeItemId))) {
+          notify(t("library.node.chooseSource"));
+          return;
+        }
+        const projectId = current.id;
+        void (async () => {
+          const resolution = await resolveCollection(
+            state.collectionId,
+            state.mode === "fixed" ? state.itemIds : undefined,
+          );
+          if (historyRef.current.present.id !== projectId)
+            throw new Error(t("canvas.workspace.error.importNotApplied"));
+          const selected = resolution.items.find((item) => item.id === state.activeItemId);
+          if (!selected) throw new Error(t("library.node.invalidSource"));
+          const importOne = rt.insertLibraryItems as
+            (items: LibraryItem[], targetId?: string) => Promise<void>;
+          await importOne([selected], target);
+          notify(t("library.node.connectedSource"));
+        })().catch((reason) => notify(errorMessage(reason)));
+        return;
+      }
       const plan = planReferenceBatch(current, sources, target);
       if (plan.issue) {
         notify(referenceIssueText(plan.issue.code));
