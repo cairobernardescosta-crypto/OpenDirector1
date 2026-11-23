@@ -4,6 +4,10 @@ export const library = {
 
  "library.collections.label": "Coleção",
   "library.collections.actions": "Ações da coleção",
+  "library.collections.rename": "Renomear coleção",
+  "library.collections.renamed": "Nome da coleção atualizado.",
+  "library.collections.saveName": "Salvar nome",
+  "library.collections.cancel": "Cancelar",
   "library.collections.unavailable": "Coleção não encontrada. Os arquivos enviados continuam disponíveis em Todos os arquivos.",
  "library.collections.new": "Nova coleção",
  "library.collections.name": "Nome da coleção",
