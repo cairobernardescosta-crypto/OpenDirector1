@@ -1,6 +1,7 @@
 import type { CanvasNode } from "./model.ts";
 import type { ReferenceInput } from "../backend/generation.ts";
 import { subjectMediaReferences } from "./subjectReferences.ts";
+import { isLibraryNodeText } from "./library/libraryNodeState.ts";
 
 /** Snapshot only explicit selection; do not silently send the whole document. */
 export function assistantReferences(
@@ -9,6 +10,8 @@ export function assistantReferences(
   const references: ReferenceInput[] = [];
   for (const node of nodes) {
     const data = node.data;
+    // Local-library manifests are configuration, not prompt or media text.
+    if (node.type === "text" && isLibraryNodeText(data.text)) continue;
     if (node.type === "text") {
       if (data.text?.trim())
         references.push({
