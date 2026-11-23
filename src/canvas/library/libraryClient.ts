@@ -405,10 +405,16 @@ export type LibraryCollectionResolution = {
 
 export async function resolveCollection(
   id: string,
+  fixedItemIds?: readonly string[],
 ): Promise<LibraryCollectionResolution> {
-  return request<LibraryCollectionResolution>(
-    `/library/collections/${encodeURIComponent(id)}/resolve`,
-  );
+  const path = `/library/collections/${encodeURIComponent(id)}/resolve`;
+  return fixedItemIds === undefined
+    ? request<LibraryCollectionResolution>(path)
+    : request<LibraryCollectionResolution>(path, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ itemIds: [...fixedItemIds] }),
+      });
 }
 
 export async function createCollection(name: string): Promise<LibraryCollection> {
