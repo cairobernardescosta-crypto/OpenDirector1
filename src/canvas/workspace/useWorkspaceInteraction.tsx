@@ -4,7 +4,7 @@ import { errorMessage } from "../../backend/api.ts";
 
 import { CanvasContextMenu } from "../CanvasContextMenu";
 import { CanvasIcon } from "../CanvasIcon";
-import { canStartReference, connectedCreationKinds, referenceIssueText, referenceMaterial } from "../connectionPolicy";
+import { canStartReference, connectedCreationKinds, referenceIssueText, referenceMaterial, referenceIssue } from "../connectionPolicy";
 import { isLibraryNodeText, parseLibraryNode } from "../library/libraryNodeState.ts";
 import { resolveCollection, type LibraryItem } from "../library/libraryClient.ts";
 import { referencePortMetrics } from "../connectionPorts";
@@ -984,6 +984,26 @@ export function useWorkspaceInteraction(rt: WorkspaceRuntime) {
         !references.sourceIds.length
       )
         return null;
+      const source = references.sourceIds.length === 1
+        ? doc.nodes.find((node) => node.id === references.sourceIds[0])
+        : undefined;
+      if (source?.type === "text" && isLibraryNodeText(source.data.text)) {
+        const state = parseLibraryNode(source.data.text);
+        if (!state?.activeItemId || !state.activeMediaKind ||
+            (state.mode === "fixed" && !state.itemIds.includes(state.activeItemId)))
+          return "invalid";
+        // Preview only: the actual bytes are imported and validated on drop.
+        // This synthetic node is never stored in the project.
+        const material = createNode(state.activeMediaKind, { x: 0, y: 0 }, {
+          src: "local-library-reference-preview",
+          mediaRole: "asset",
+        });
+        return referenceIssue(
+          { ...doc, nodes: [...doc.nodes, material] },
+          material.id,
+          id,
+        ) ? "invalid" : "valid";
+      }
       return planReferenceBatch(doc, references.sourceIds, id).issue
         ? "invalid"
         : "valid";
