@@ -22,6 +22,8 @@ export const library = {
   "library.node.importedSource": "Media imported as an independent node. Use that node's arrow to connect it to another card.",
   "library.node.connectedSource": "Media imported as a native node and connected to the destination card.",
   "library.node.extract": "Add media as a canvas node",
+  "library.node.view": "View file at full size",
+  "library.node.closePreview": "Close preview",
   "library.node.active": "Selected source for creating a connected node",
   "library.node.more": "Show more",
   "library.collections.rename": "Rename collection",
