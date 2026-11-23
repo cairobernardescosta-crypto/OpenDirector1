@@ -3,6 +3,7 @@ export const library = {
 
  "library.collections.label": "Collection",
   "library.collections.actions": "Collection actions",
+  "library.collections.unavailable": "Collection not found. Uploaded files remain available in All files.",
  "library.collections.new": "New collection",
  "library.collections.name": "Collection name",
  "library.collections.create": "Create",
