@@ -90,6 +90,12 @@ export function CreationMenuContent({
           </button>
         ),
       )}
+      {allowedKinds?.includes("file") && (
+        <button role="menuitem" onClick={() => onCreate("file")}>
+          <CanvasIcon name="file" size={18} />
+          <span>{t("canvasNodes.kind.file")}</span>
+        </button>
+      )}
       {!allowedKinds && (
         <>
           {onCreateLibrary && (
