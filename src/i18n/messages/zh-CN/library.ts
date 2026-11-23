@@ -17,6 +17,7 @@ export const library = {
   "library.node.fixedHint": "选择要固定引用的文件。",
   "library.node.readOnly": "只读引用",
   "library.node.refresh": "刷新引用",
+  "library.node.filter": "按类型筛选文件",
   "library.node.more": "显示更多",
   "library.collections.rename": "重命名集合",
   "library.collections.renamed": "集合名称已更新。",
