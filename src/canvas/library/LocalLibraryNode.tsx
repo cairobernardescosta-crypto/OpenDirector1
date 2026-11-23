@@ -73,7 +73,7 @@ export function LocalLibraryNode({
         <select value={state.mode} disabled={locked || !state.collectionId}
           onChange={(event) => change({
             mode: event.target.value === "fixed" ? "fixed" : "dynamic",
-            itemIds: event.target.value === "fixed" ? resolved?.items.map((item) => item.id) ?? state.itemIds : [],
+            itemIds: event.target.value === "fixed" ? resolved?.items.slice(0, 1000).map((item) => item.id) ?? state.itemIds : [],
           })}>
           <option value="dynamic">{t("library.node.dynamic")}</option>
           <option value="fixed">{t("library.node.fixed")}</option>
