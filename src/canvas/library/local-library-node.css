@@ -48,3 +48,52 @@
   border-radius: 7px; background: var(--cw-lib-input, #191c1f);
   font-size: 11px;
 }
+
+/* The background participates in native React Flow node dragging.
+ * Interactive controls retain their own pointer/keyboard semantics. */
+.cw-node-text .cw-local-library {
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 13px;
+}
+.cw-node-text .cw-local-library-grid .cw-lib-card {
+  min-width: 0;
+}
+.cw-node-text .cw-local-library-grid .cw-lib-caption {
+  min-width: 0;
+  overflow: hidden;
+}
+.cw-node-text .cw-local-library-grid .cw-lib-title {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: block;
+  max-width: 100%;
+}
+.cw-local-library-extract {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  width: 25px;
+  height: 25px;
+  border: 1px solid #ffffff50;
+  color: #fff;
+  background: #1f2225e8;
+  cursor: pointer;
+}
+.cw-local-library-extract:focus-visible {
+  outline: 2px solid #b7a0ef;
+  outline-offset: 2px;
+}
+.cw-node-text .cw-local-library-search {
+  min-width: 0;
+}
+.cw-node-text .cw-local-library-readonly,
+.cw-node-text .cw-local-library-hint {
+  overflow-wrap: anywhere;
+}
