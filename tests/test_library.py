@@ -286,6 +286,15 @@ def test_collection_reference_resolution_is_read_only_and_reports_unavailable(cl
     assert [item['id'] for item in initial.json()['items']] == [photo['id'], song['id']]
     assert initial.json()['unavailableIds'] == []
 
+    chosen = client.post(f'/api/library/collections/{key}/resolve',
+                         json={'itemIds': [song['id']]})
+    assert chosen.status_code == 200, chosen.text
+    assert [item['id'] for item in chosen.json()['items']] == [song['id']]
+    assert client.post(f'/api/library/collections/{key}/resolve',
+                       json={'itemIds': [str(uuid4())]}).status_code == 422
+    assert client.post(f'/api/library/collections/{key}/resolve',
+                       json={'itemIds': []}).json()['items'] == []
+
     client.post('/api/library/items/trash', json={'itemIds': [song['id']]})
     later = client.get(f'/api/library/collections/{key}/resolve')
     assert later.status_code == 200, later.text
