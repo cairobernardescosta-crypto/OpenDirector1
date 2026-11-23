@@ -66,7 +66,7 @@ export function LocalLibraryNode({
     (!mediaFilter || item.mediaKind === mediaFilter)
   ) ?? [];
   return (
-    <div className="cw-local-library nodrag nopan nowheel" onPointerDown={(event) => event.stopPropagation()}>
+    <div className="cw-local-library nowheel">
       <label className="cw-local-library-line">
         <span>{t("library.node.collection")}</span>
         <select value={state.collectionId} disabled={locked || busy}
