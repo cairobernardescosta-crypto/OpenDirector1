@@ -48,6 +48,7 @@ type CreationActions = {
 
 export function CreationMenuContent({
   onCreate,
+  onCreateLibrary,
   onAssets,
   onUpload,
   allowedKinds,
