@@ -615,7 +615,11 @@ export function WorkspaceView({ rt }: { rt: WorkspaceRuntime }) {
           )
         }
       >
-        <CanvasActionsContext.Provider value={actions}>
+        <CanvasActionsContext.Provider value={{ ...actions,
+          insertLibraryItem: (item) => {
+            void insertLibraryItems([item]).catch((reason) => notify(errorMessage(reason)));
+          },
+        }}>
           <CanvasFlowSurface
             ref={flowSurface}
             documentNodes={doc.nodes}
