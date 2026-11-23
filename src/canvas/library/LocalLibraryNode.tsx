@@ -3,7 +3,7 @@ import type { CanvasActions } from "../CanvasActionsContext";
 import { CanvasIcon } from "../CanvasIcon";
 import { useT } from "../../i18n/I18nProvider";
 import { errorMessage } from "../../backend/api";
-import { listCollections, resolveCollection, type LibraryCollection, type LibraryCollectionResolution } from "./libraryClient";
+import { listCollections, resolveCollection, type LibraryCollection, type LibraryCollectionResolution, type LibraryMediaKind } from "./libraryClient";
 import { encodeLibraryNode, type LibraryNodeState } from "./libraryNodeState";
 import { MediaCard } from "./MediaCard";
 import "./local-library-node.css";
@@ -27,6 +27,7 @@ export function LocalLibraryNode({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [search, setSearch] = useState("");
+  const [mediaFilter, setMediaFilter] = useState<LibraryMediaKind | "">("");
   const [shown, setShown] = useState(12);
   const [refresh, setRefresh] = useState(0);
 
@@ -61,7 +62,8 @@ export function LocalLibraryNode({
   };
   const current = collections.find((item) => item.id === state.collectionId);
   const matching = resolved?.items.filter((item) =>
-    item.name.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase())
+    item.name.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()) &&
+    (!mediaFilter || item.mediaKind === mediaFilter)
   ) ?? [];
   return (
     <div className="cw-local-library nodrag nopan nowheel" onPointerDown={(event) => event.stopPropagation()}>
@@ -95,6 +97,14 @@ export function LocalLibraryNode({
             <input value={search} placeholder={t("library.search.placeholder")}
               aria-label={t("library.search.label")}
               onChange={(event) => { setSearch(event.target.value); setShown(12); }} />
+            <select value={mediaFilter} aria-label={t("library.node.filter")}
+              onChange={(event) => { setMediaFilter(event.target.value as LibraryMediaKind | ""); setShown(12); }}>
+              <option value="">{t("library.all")}</option>
+              <option value="image">{t("library.category.image")}</option>
+              <option value="video">{t("library.category.video")}</option>
+              <option value="audio">{t("library.category.audio")}</option>
+              <option value="file">{t("library.category.file")}</option>
+            </select>
             <button type="button" onClick={() => setRefresh((value) => value + 1)}
               aria-label={t("library.node.refresh")} title={t("library.node.refresh")}>
               <CanvasIcon name="history" size={14} />
