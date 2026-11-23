@@ -41,6 +41,7 @@ function menuKeys(event: KeyboardEvent<HTMLDivElement>) {
 
 type CreationActions = {
   onCreate: (kind: CanvasNodeKind) => void;
+  onCreateLibrary?: () => void;
   onAssets: () => void;
   onUpload: () => void;
 };
@@ -90,6 +91,12 @@ export function CreationMenuContent({
       )}
       {!allowedKinds && (
         <>
+          {onCreateLibrary && (
+            <button role="menuitem" onClick={onCreateLibrary}>
+              <CanvasIcon name="rail-folder" size={18} />
+              <span>{t("library.node.title")}</span>
+            </button>
+          )}
           <hr />
           <button role="menuitem" onClick={onAssets}>
             <CanvasIcon name="rail-folder" size={18} />
@@ -212,6 +219,7 @@ export function CanvasCreationMenu({
   };
   const creationActions = {
     onCreate: (kind: CanvasNodeKind) => run(() => actions.onCreate(kind)),
+    onCreateLibrary: actions.onCreateLibrary ? () => run(actions.onCreateLibrary!) : undefined,
     onAssets: () => run(actions.onAssets),
     onUpload: () => run(actions.onUpload),
   };
