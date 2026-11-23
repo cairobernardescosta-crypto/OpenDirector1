@@ -131,7 +131,8 @@ export function NodeFrame({
         {locked && <CanvasIcon name="lock" size={12} />}
       </div>
       {children}
-      {["text", "image", "video", "audio"].includes(kind) &&
+      {icon !== "rail-folder" &&
+        ["text", "image", "video", "audio"].includes(kind) &&
         (actions?.versionCount?.(id) ?? 0) > 1 && (
           <button
             type="button"
