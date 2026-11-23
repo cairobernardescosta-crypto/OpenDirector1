@@ -23,6 +23,8 @@ export const library = {
   "library.node.importedSource": "Mídia importada como nó independente. Agora use a seta desse nó para conectar a outros cards.",
   "library.node.connectedSource": "Mídia importada como nó nativo e conectada ao card de destino.",
   "library.node.extract": "Adicionar mídia como nó no canvas",
+  "library.node.view": "Visualizar arquivo em tamanho completo",
+  "library.node.closePreview": "Fechar visualização",
   "library.node.active": "Fonte selecionada para criar um nó conectado",
   "library.node.more": "Mostrar mais",
   "library.collections.rename": "Renomear coleção",
