@@ -14,6 +14,8 @@ import { TooltipButton } from "./TooltipButton";
 import { GeneratingOverlay } from "./GeneratingOverlay";
 import { TimelinePendingVideo } from "./TimelineOutput";
 import { CanvasVideoPreview } from "./CanvasMediaPreview";
+import { LocalLibraryNode } from "./library/LocalLibraryNode";
+import { parseLibraryNode } from "./library/libraryNodeState";
 import "./nodes.css";
 import {
   CanvasActionsContext,
@@ -49,6 +51,7 @@ function CanvasNodeContents({ id, data, selected }: NodeProps<CanvasFlowNode>) {
   const { t } = useI18n();
   const actions = useContext(CanvasActionsContext);
   const kind = data.kind;
+  const libraryState = kind === "text" ? parseLibraryNode(data.text) : null;
   const hasAsset = Boolean(data.src) && data.assetState !== "missing";
   const locked = Boolean(actions?.isLocked(id));
   const activity = ["text", "image", "video", "audio"].includes(kind)
@@ -74,6 +77,7 @@ function CanvasNodeContents({ id, data, selected }: NodeProps<CanvasFlowNode>) {
         kind === "subject" ? !data.subject?.main?.src : !hasAsset && !data.text
       }
       busy={Boolean(activity)}
+      icon={libraryState ? "rail-folder" : undefined}
     >
       {kind === "group" ? (
         <div className="cw-group-interior" />
@@ -81,6 +85,8 @@ function CanvasNodeContents({ id, data, selected }: NodeProps<CanvasFlowNode>) {
         <SubjectNodeCard id={id} data={data} actions={actions} />
       ) : ["timeline", "stack", "tool", "external"].includes(kind) ? (
         <DomainCard id={id} data={data} actions={actions} />
+      ) : libraryState ? (
+        <LocalLibraryNode id={id} state={libraryState} actions={actions} locked={locked} />
       ) : kind === "text" ? (
         actions?.isTextEditing(id) ? (
           <TextNodeEditor
