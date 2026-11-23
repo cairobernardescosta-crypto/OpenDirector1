@@ -14,6 +14,7 @@ export function NodeFrame({
   selected,
   empty,
   busy,
+  icon,
   children,
 }: {
   id: string;
@@ -22,6 +23,7 @@ export function NodeFrame({
   selected: boolean;
   empty: boolean;
   busy: boolean;
+  icon?: string;
   children: ReactNode;
 }) {
   const { t, locale } = useI18n();
@@ -64,7 +66,7 @@ export function NodeFrame({
     >
       <div className="cw-node-heading">
         <span className="cw-node-type">
-          <CanvasIcon name={kind} size={15} />
+          <CanvasIcon name={icon ?? kind} size={15} />
         </span>
         {editing ? (
           <span
