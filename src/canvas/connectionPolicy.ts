@@ -79,6 +79,10 @@ export function canStartReference(node: CanvasNode): boolean {
 }
 
 export function canSourceReference(node: CanvasNode): boolean {
+  // The library card's port starts a UI creation/import gesture only.
+  // Its persisted text is a manifest, never usable as source material.
+  if (node.type === "text" && isLibraryNodeText(node.data.text))
+    return false;
   if (!canStartReference(node) || node.data.assetState === "missing")
     return false;
   if (node.type === "text") return Boolean(node.data.text?.trim());
