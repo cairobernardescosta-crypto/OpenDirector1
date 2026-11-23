@@ -102,15 +102,46 @@ export function useWorkspaceTransfer(rt: WorkspaceRuntime) {
   }, [ready, doc.id]);
 
   /** Copies a picked resource onto the current canvas as independent nodes. */
-  const importCanvasResource = async (resource: CanvasResource) => {
+  const importCanvasResource = async (
+    resource: CanvasResource,
+    targetNodeId?: string,
+    worldPosition?: Point,
+  ) => {
     const current = historyRef.current.present;
-    const where = center();
+    if (switchPending.current || current.id !== doc.id)
+      throw new Error(t("canvas.workspace.error.importNotApplied"));
+    const target = targetNodeId
+      ? current.nodes.find((item) => item.id === targetNodeId)
+      : undefined;
+    if (targetNodeId && (!target || lockedIds.has(targetNodeId)))
+      throw new Error(t("canvas.workspace.error.referenceKindUnsupported"));
+    const where = worldPosition ??
+      (target
+        ? { x: target.position.x - 420, y: target.position.y }
+        : center());
     const node = createNode(
       resource.kind,
-      { x: where.x - 160, y: where.y - 140 },
+      worldPosition || target ? where : { x: where.x - 160, y: where.y - 140 },
       resourceNodeData(resource),
     );
-    const next = applyCommand(current, { type: "add-nodes", nodes: [node] });
+    let next = applyCommand(current, { type: "add-nodes", nodes: [node] });
+    if (targetNodeId) {
+      const issue = referenceIssue(next, node.id, targetNodeId);
+      if (issue) throw new Error(referenceIssueText(issue));
+      next = applyCommand(next, {
+        type: "add-edge",
+        edge: {
+          id: crypto.randomUUID(),
+          source: node.id,
+          target: targetNodeId,
+          sourceHandle: "out",
+          targetHandle: "in",
+        },
+      });
+      if (!next.edges.some((edge) =>
+        edge.source === node.id && edge.target === targetNodeId
+      )) throw new Error(t("canvas.workspace.error.referenceKindUnsupported"));
+    }
     if (!(await persist(next)))
       throw new Error(saveError.current || t("canvas.workspace.error.importUnsaved"));
     if (historyRef.current.present.id !== current.id) return;
@@ -121,7 +152,7 @@ export function useWorkspaceTransfer(rt: WorkspaceRuntime) {
     notify(t("canvas.workspace.toast.resourceCopied"));
   };
 
-  const insertLibraryItems = async (items: LibraryItem[]) => {
+  const insertLibraryItems = async (items: LibraryItem[], targetNodeId?: string, worldPosition?: Point) => {
     const client = creationClient(doc.id);
     let placed = 0;
     const issues: string[] = [];
@@ -141,7 +172,7 @@ export function useWorkspaceTransfer(rt: WorkspaceRuntime) {
         resource.assetId = ref.assetId;
         resource.src = await client.mediaUrl(ref.assetId);
 
-        await importCanvasResource(resource);
+        await importCanvasResource(resource, targetNodeId, worldPosition);
         placed += 1;
       } catch (reason) {
         issues.push(
