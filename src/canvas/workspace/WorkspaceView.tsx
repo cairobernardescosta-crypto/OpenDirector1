@@ -400,7 +400,7 @@ export function WorkspaceView({ rt }: { rt: WorkspaceRuntime }) {
 
   /** Port drag from a library card imports a real canvas-owned media node.
    * Never build a reference edge from the serialized collection manifest. */
-  const insertConnectedLibraryItem = async (sourceId: string, kind: string) => {
+  const insertConnectedLibraryItem = async (sourceId: string, kind: string, worldPosition?: { x: number; y: number }) => {
     const node = doc.nodes.find((candidate) => candidate.id === sourceId);
     const state = parseLibraryNode(node?.data.text);
     if (!state?.collectionId || !state.activeItemId) {
@@ -421,7 +421,7 @@ export function WorkspaceView({ rt }: { rt: WorkspaceRuntime }) {
         notify(t("library.node.invalidSource"));
         return;
       }
-      await insertLibraryItems([media]);
+      await insertLibraryItems([media], undefined, worldPosition);
       notify(t("library.node.importedSource"));
     } catch (reason) {
       notify(errorMessage(reason));
@@ -2109,7 +2109,7 @@ export function WorkspaceView({ rt }: { rt: WorkspaceRuntime }) {
                   : undefined;
                 if (source && isLibraryNodeText(source.data.text)) {
                   setMenu(null);
-                  void insertConnectedLibraryItem(source.id, kind);
+                  void insertConnectedLibraryItem(source.id, kind, menu.world);
                 } else addNode(kind, menu.world);
               }}
               onAssets={() => setLibraryOpen(true)}
