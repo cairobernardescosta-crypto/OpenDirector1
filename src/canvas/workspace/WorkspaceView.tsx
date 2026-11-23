@@ -62,7 +62,8 @@ import { arrangeNodes } from "../geometry";
 import { ImageActionEditor, isImageActionTool } from "../ImageActionEditor";
 import { ImageEditor } from "../ImageEditor";
 import { AssetLibraryDialog } from "../library/AssetLibraryDialog";
-import { encodeLibraryNode, isLibraryNodeText } from "../library/libraryNodeState";
+import { encodeLibraryNode, isLibraryNodeText, parseLibraryNode } from "../library/libraryNodeState";
+import { resolveCollection } from "../library/libraryClient";
 import "../library/library.css";
 import { SubjectImportDialog } from "../library/SubjectImportDialog";
 import { validateNodeActionSource } from "../linkedResults";
@@ -396,6 +397,36 @@ export function WorkspaceView({ rt }: { rt: WorkspaceRuntime }) {
     output.id = outputState.output.id;
     rt.revealCreatedNodes.current([output], doc.nodes.some((node) => node.id === output.id) ? doc.nodes : [...doc.nodes, output]);
   }, [outputState?.output.id]);
+
+  /** Port drag from a library card imports a real canvas-owned media node.
+   * Never build a reference edge from the serialized collection manifest. */
+  const insertConnectedLibraryItem = async (sourceId: string, kind: string) => {
+    const node = doc.nodes.find((candidate) => candidate.id === sourceId);
+    const state = parseLibraryNode(node?.data.text);
+    if (!state?.collectionId || !state.activeItemId) {
+      notify(t("library.node.chooseSource"));
+      return;
+    }
+    try {
+      if (state.mode === "fixed" && !state.itemIds.includes(state.activeItemId)) {
+        notify(t("library.node.chooseSource"));
+        return;
+      }
+      const snapshot = await resolveCollection(
+        state.collectionId,
+        state.mode === "fixed" ? state.itemIds : undefined,
+      );
+      const media = snapshot.items.find((item) => item.id === state.activeItemId);
+      if (!media || media.mediaKind !== kind) {
+        notify(t("library.node.invalidSource"));
+        return;
+      }
+      await insertLibraryItems([media]);
+      notify(t("library.node.importedSource"));
+    } catch (reason) {
+      notify(errorMessage(reason));
+    }
+  };
 
   const [workflowGroups, setWorkflowGroups] = useState<ReadonlySet<string>>(() => new Set());
   const runWorkflow = (groupId: string) => {
@@ -2049,7 +2080,10 @@ export function WorkspaceView({ rt }: { rt: WorkspaceRuntime }) {
           ) : (
             <CreationMenuContent
               allowedKinds={
-                menu.connected
+                menu.connected && menu.connected.direction === "source" &&
+                isLibraryNodeText(doc.nodes.find((n) => n.id === menu.connected?.id)?.data.text)
+                  ? ["image", "video", "audio"]
+                  : menu.connected
                   ? menu.connected.ids && menu.connected.ids.length > 1
                     ? batchCreationKinds(
                         doc,
@@ -2069,7 +2103,15 @@ export function WorkspaceView({ rt }: { rt: WorkspaceRuntime }) {
                       )
                   : undefined
               }
-              onCreate={(kind) => addNode(kind, menu.world)}
+              onCreate={(kind) => {
+                const source = menu.connected?.direction === "source"
+                  ? doc.nodes.find((n) => n.id === menu.connected?.id)
+                  : undefined;
+                if (source && isLibraryNodeText(source.data.text)) {
+                  setMenu(null);
+                  void insertConnectedLibraryItem(source.id, kind);
+                } else addNode(kind, menu.world);
+              }}
               onAssets={() => setLibraryOpen(true)}
               onUpload={() => openFilePicker()}
             />
