@@ -6,7 +6,7 @@
   padding: 12px;
   color: var(--cw-node-text, inherit);
   min-height: 180px;
-  max-height: 380px;
+  max-height: 250px;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
