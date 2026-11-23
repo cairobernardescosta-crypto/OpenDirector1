@@ -2110,6 +2110,21 @@ export function WorkspaceView({ rt }: { rt: WorkspaceRuntime }) {
                   void insertConnectedLibraryItem(source.id, kind, menu.world);
                 } else addNode(kind, menu.world);
               }}
+              onCreateLibrary={() => {
+                // A library manifest cannot be a generation input. Create the
+                // proper library card at the wire drop location without
+                // forging a media-reference edge from/to the manifest.
+                const node = createNode("text", menu.world, {
+                  title: nextNodeTitle(doc, "text", t("library.node.title")),
+                  text: encodeLibraryNode({
+                    version: 1, collectionId: "", mode: "dynamic", itemIds: [],
+                  }),
+                });
+                node.width = 380;
+                node.height = 360;
+                command({ type: "add-nodes", nodes: [node] });
+                setMenu(null);
+              }}
               onAssets={() => setLibraryOpen(true)}
               onUpload={() => openFilePicker()}
             />
