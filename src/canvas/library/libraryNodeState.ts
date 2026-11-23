@@ -54,6 +54,15 @@ export function parseLibraryNode(text?: string): LibraryNodeState | null {
   }
 }
 
+/** The native creation menu offers the selected file's kind only.
+ * Without a selected item it presents the media types, then asks the user to
+ * choose an actual file before any persistent canvas operation. */
+export function libraryCreationKinds(state: LibraryNodeState | null) {
+  return state?.activeMediaKind
+    ? [state.activeMediaKind] as const
+    : ["image", "video", "audio", "file"] as const;
+}
+
 export function isLibraryNodeText(text?: string): boolean {
   return parseLibraryNode(text) !== null;
 }
