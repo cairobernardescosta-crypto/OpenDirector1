@@ -20,6 +20,7 @@ export const library = {
   "library.node.chooseSource": "Select a media item in the Local library before dragging a connection.",
   "library.node.invalidSource": "The selected media is unavailable or does not match the requested type.",
   "library.node.importedSource": "Media imported as an independent node. Use that node's arrow to connect it to another card.",
+  "library.node.connectedSource": "Media imported as a native node and connected to the destination card.",
   "library.node.extract": "Add media as a canvas node",
   "library.node.active": "Selected source for creating a connected node",
   "library.node.more": "Show more",
