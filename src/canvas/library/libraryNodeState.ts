@@ -14,6 +14,7 @@ export type LibraryNodeState = {
   itemIds: string[];
   /** One explicit media item to export through a native canvas node. */
   activeItemId?: string;
+  activeMediaKind?: "image" | "video" | "audio" | "file";
 };
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -35,13 +36,18 @@ export function parseLibraryNode(text?: string): LibraryNodeState | null {
         !state.itemIds.every((id) => typeof id === "string" && uuid.test(id)) ||
         new Set(state.itemIds).size !== state.itemIds.length ||
         (state.activeItemId !== undefined &&
-          (typeof state.activeItemId !== "string" || !uuid.test(state.activeItemId)))) return null;
+          (typeof state.activeItemId !== "string" || !uuid.test(state.activeItemId))) ||
+        (state.activeMediaKind !== undefined &&
+          !["image", "video", "audio", "file"].includes(String(state.activeMediaKind)))) return null;
     return {
       version: 1,
       collectionId: state.collectionId,
       mode: state.mode,
       itemIds: [...state.itemIds],
       ...(state.activeItemId !== undefined ? { activeItemId: state.activeItemId } : {}),
+      ...(state.activeMediaKind !== undefined
+        ? { activeMediaKind: state.activeMediaKind as LibraryNodeState["activeMediaKind"] }
+        : {}),
     };
   } catch {
     return null;
