@@ -99,6 +99,34 @@ class LibraryCollections:
             write_json(self.path, index.model_dump(mode='json'))
             return updated
 
+    def resolve(self, collection_id: UUID, selected_ids: list[UUID] | None = None) -> dict:
+        """Read-only reference snapshot for future canvas-node execution.
+
+        Resolve by stable IDs; removed/trashed assets never become references.
+        This never opens blobs or modifies the library index, collections or
+        any model settings.
+        """
+        with self.lock:
+            current = self._read().collections.get(collection_id)
+            if current is None:
+                raise ProjectError('Coleção não encontrada.', 404)
+            allowed = set(current.itemIds)
+            requested = list(dict.fromkeys(selected_ids)) if selected_ids is not None else list(current.itemIds)
+            if len(requested) > 100000:
+                raise ProjectError('Limite de itens na coleção atingido.', 422)
+            if any(item_id not in allowed for item_id in requested):
+                raise ProjectError('Arquivo não pertence à coleção.', 422)
+            collection = current.model_copy(deep=True)
+
+        active = {item.id: item for item in self.library.list(kind='asset', state='active')}
+        return {
+            'collectionId': collection.id,
+            'collectionName': collection.name,
+            'itemIds': requested,
+            'items': [active[item_id] for item_id in requested if item_id in active],
+            'unavailableIds': [item_id for item_id in requested if item_id not in active],
+        }
+
     def delete(self, collection_id: UUID) -> dict:
         with self.lock:
             index = self._read()
