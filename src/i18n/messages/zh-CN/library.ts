@@ -4,6 +4,10 @@ export const library = {
 
  "library.collections.label": "素材集合",
   "library.collections.actions": "集合操作",
+  "library.collections.rename": "重命名集合",
+  "library.collections.renamed": "集合名称已更新。",
+  "library.collections.saveName": "保存名称",
+  "library.collections.cancel": "取消",
   "library.collections.unavailable": "未找到集合。上传的文件仍可在所有文件中使用。",
  "library.collections.new": "新建集合",
  "library.collections.name": "集合名称",
