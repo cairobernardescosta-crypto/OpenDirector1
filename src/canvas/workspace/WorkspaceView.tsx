@@ -62,6 +62,7 @@ import { arrangeNodes } from "../geometry";
 import { ImageActionEditor, isImageActionTool } from "../ImageActionEditor";
 import { ImageEditor } from "../ImageEditor";
 import { AssetLibraryDialog } from "../library/AssetLibraryDialog";
+import { encodeLibraryNode } from "../library/libraryNodeState";
 import "../library/library.css";
 import { SubjectImportDialog } from "../library/SubjectImportDialog";
 import { validateNodeActionSource } from "../linkedResults";
@@ -1118,6 +1119,16 @@ export function WorkspaceView({ rt }: { rt: WorkspaceRuntime }) {
             onClick: tool.unavailable ? undefined : () => addNode(tool.kind),
           })),
           {
+            name: "local-library",
+            icon: "rail-folder",
+            label: t("library.node.title"),
+            actionLabel: t("canvas.rail.add", { label: t("library.node.title") }),
+            onClick: () => addNode("text", undefined, {
+              title: t("library.node.title"),
+              text: encodeLibraryNode({ version: 1, collectionId: "", mode: "dynamic", itemIds: [] }),
+            }),
+          },
+          {
             name: "folder",
             icon: "rail-folder",
             label: t("canvas.rail.assets"),
@@ -1926,6 +1937,10 @@ export function WorkspaceView({ rt }: { rt: WorkspaceRuntime }) {
           canUndo={businessHistory.undo && !historyReplaying}
           canRedo={businessHistory.redo && !historyReplaying}
           onCreate={(kind) => addNode(kind, menu.world)}
+          onCreateLibrary={() => addNode("text", menu.world, {
+            title: t("library.node.title"),
+            text: encodeLibraryNode({ version: 1, collectionId: "", mode: "dynamic", itemIds: [] }),
+          })}
           onAssets={() => {
             referenceTarget.current = null;
             setAssistantOpen(false);
