@@ -62,7 +62,7 @@ import { arrangeNodes } from "../geometry";
 import { ImageActionEditor, isImageActionTool } from "../ImageActionEditor";
 import { ImageEditor } from "../ImageEditor";
 import { AssetLibraryDialog } from "../library/AssetLibraryDialog";
-import { encodeLibraryNode } from "../library/libraryNodeState";
+import { encodeLibraryNode, isLibraryNodeText } from "../library/libraryNodeState";
 import "../library/library.css";
 import { SubjectImportDialog } from "../library/SubjectImportDialog";
 import { validateNodeActionSource } from "../linkedResults";
@@ -1751,7 +1751,7 @@ export function WorkspaceView({ rt }: { rt: WorkspaceRuntime }) {
           blocked={timelineOutput.busy && timelineOutput.state?.itemId !== single.id || !!(timelineOutput.blockedItemId && timelineOutput.blockedItemId !== single.id)}
           onRun={() => void timelineOutput.run(single, () => persist(doc, false))} />
       )}
-      {hasComposer && composerNode && composerNode.type !== "timeline" && (
+      {hasComposer && composerNode && composerNode.type !== "timeline" && !isLibraryNodeText(composerNode.data.text) && (
         <>
           {composerExpanded && (
             <div
