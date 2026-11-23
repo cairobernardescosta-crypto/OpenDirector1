@@ -972,6 +972,11 @@ export function useWorkspaceInteraction(rt: WorkspaceRuntime) {
 
   const actions = {
     resizeSubjectDescription,
+    insertLibraryItem: (item: LibraryItem) => {
+      const importOne = rt.insertLibraryItems as
+        (items: LibraryItem[]) => Promise<void>;
+      void importOne([item]).catch((reason) => notify(errorMessage(reason)));
+    },
     removeReference: (id: string) => {
       if (id.startsWith("tool-")) return;
       root.current?.focus({ preventScroll: true });
