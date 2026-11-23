@@ -40,7 +40,7 @@ export function LocalLibraryNode({
     setResolved(null);
     if (!state.collectionId) return;
     setBusy(true);
-    resolveCollection(state.collectionId, state.mode === "fixed" ? state.itemIds : undefined)
+    resolveCollection(state.collectionId)
       .then((data) => {
         if (!active) return;
         setError("");
@@ -49,7 +49,7 @@ export function LocalLibraryNode({
       .catch((reason) => { if (active) setError(errorMessage(reason)); })
       .finally(() => { if (active) setBusy(false); });
     return () => { active = false; };
-  }, [state.collectionId, state.mode, state.itemIds.join("|")]);
+  }, [state.collectionId]);
 
   const change = (patch: Partial<LibraryNodeState>) => {
     if (locked) return;
@@ -85,10 +85,10 @@ export function LocalLibraryNode({
       {resolved && (
         <>
           <div className="cw-local-library-meta">
-            <span>{resolved.items.length} {t("library.node.files")}</span>
-            {resolved.unavailableIds.length > 0 && (
+            <span>{state.mode === "fixed" ? resolved.items.filter((item) => state.itemIds.includes(item.id)).length : resolved.items.length} {t("library.node.files")}</span>
+            {(state.mode === "fixed" ? state.itemIds.filter((id) => !resolved.items.some((item) => item.id === id)).length : resolved.unavailableIds.length) > 0 && (
               <span className="cw-local-library-error">
-                {resolved.unavailableIds.length} {t("library.node.missing")}
+                {state.mode === "fixed" ? state.itemIds.filter((id) => !resolved.items.some((item) => item.id === id)).length : resolved.unavailableIds.length} {t("library.node.missing")}
               </span>
             )}
           </div>
@@ -102,7 +102,7 @@ export function LocalLibraryNode({
                 onSelect={() => change({
                   itemIds: state.itemIds.includes(item.id)
                     ? state.itemIds.filter((id) => id !== item.id)
-                    : [...state.itemIds, item.id],
+                    : [...state.itemIds, item.id].slice(0, 1000),
                 })}
               />
             ))}
