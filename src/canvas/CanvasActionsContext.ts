@@ -1,5 +1,6 @@
 import { createContext, type MouseEvent } from "react";
 import type { CanvasNode, CanvasNodeData } from "./model";
+import type { LibraryItem } from "./library/libraryClient";
 import type { NodeGenerationActivity } from "./generationActivity";
 import type { TextSelections } from "./TextNodeEditor";
 import type { SubjectMediaSlot } from "./subjectMedia.ts";
@@ -16,6 +17,8 @@ export interface CanvasActions {
   versionsOpen?: (id: string) => boolean;
   showVersions?: (id: string, anchor: DOMRect) => void;
   upload: (id: string) => void;
+  /** Safely imports a global-library media item as its own canvas-owned node. */
+  insertLibraryItem?: (item: LibraryItem) => void;
   preview: (id: string) => void;
   newConnected: (id: string, direction: "source" | "target") => void;
   contextMenu: (id: string, event: MouseEvent) => void;
