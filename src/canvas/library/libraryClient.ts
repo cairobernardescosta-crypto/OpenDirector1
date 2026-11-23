@@ -383,10 +383,13 @@ export type LibraryCollection = {
   itemIds: string[];
 };
 
-export async function listCollections(): Promise<LibraryCollection[]> {
+export async function listCollections(
+  read: { fresh?: boolean } = {},
+): Promise<LibraryCollection[]> {
   return cachedRequest<LibraryCollection[]>(
     "library:collections",
     () => request<LibraryCollection[]>("/library/collections"),
+    read,
   );
 }
 
