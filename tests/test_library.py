@@ -272,6 +272,29 @@ def test_collections_reference_media_without_copying_or_deleting(client, tmp_pat
     assert client.get(f"/api/library/items/{song['id']}/content").status_code == 200
 
 
+def test_collection_reference_resolution_is_read_only_and_reports_unavailable(client):
+    """Native-library inputs must never mutate collections or return trashed media."""
+    photo = upload(client, name='portrait.png').json()
+    song = upload(client, data=b'fake-audio-for-metadata', name='theme.mp3', mime='audio/mpeg').json()
+    created = client.post('/api/library/collections', json={'name': 'cairo'}).json()
+    key = created['id']
+    client.put(f'/api/library/collections/{key}/items',
+               json={'itemIds': [photo['id'], song['id']]})
+    initial = client.get(f'/api/library/collections/{key}/resolve')
+    assert initial.status_code == 200, initial.text
+    assert initial.json()['collectionName'] == 'cairo'
+    assert [item['id'] for item in initial.json()['items']] == [photo['id'], song['id']]
+    assert initial.json()['unavailableIds'] == []
+
+    client.post('/api/library/items/trash', json={'itemIds': [song['id']]})
+    later = client.get(f'/api/library/collections/{key}/resolve')
+    assert later.status_code == 200, later.text
+    assert [item['id'] for item in later.json()['items']] == [photo['id']]
+    assert later.json()['unavailableIds'] == [song['id']]
+    assert client.get('/api/library/collections').json()[0]['itemIds'] == [photo['id'], song['id']]
+    assert client.get(f'/api/library/collections/{uuid4()}/resolve').status_code == 404
+
+
 def test_collections_reject_nonexistent_or_trashed_items_without_partial_membership(client):
     photo = upload(client).json()
     created = client.post('/api/library/collections', json={'name': 'Week'}).json()
