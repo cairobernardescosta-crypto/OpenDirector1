@@ -39,6 +39,7 @@ import {
   type ClipboardMedia,
 } from "../clipboardMedia.ts";
 import { resourceNodeData } from "../projectAssets";
+import { absolutePosition } from "../geometry.ts";
 import { mergeImportedLibraryMedia } from "../library/libraryImportMerge.ts";
 import { persistCurrentDocument } from "../projectManagement";
 import { measureSubjectNodeHeight } from "../subjectLayoutMeasurement.ts";
@@ -118,7 +119,10 @@ export function useWorkspaceTransfer(rt: WorkspaceRuntime) {
       throw new Error(t("canvas.workspace.error.referenceKindUnsupported"));
     const where = worldPosition ??
       (target
-        ? { x: target.position.x - 420, y: target.position.y }
+        ? (() => {
+            const position = absolutePosition(target, current.nodes);
+            return { x: position.x - 420, y: position.y };
+          })()
         : center());
     const node = createNode(
       resource.kind,
