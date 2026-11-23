@@ -26,6 +26,9 @@ export function LocalLibraryNode({
   const [resolved, setResolved] = useState<LibraryCollectionResolution | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [search, setSearch] = useState("");
+  const [shown, setShown] = useState(12);
+  const [refresh, setRefresh] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -38,7 +41,8 @@ export function LocalLibraryNode({
   useEffect(() => {
     let active = true;
     setResolved(null);
-    if (!state.collectionId) return;
+    setError("");
+    if (!state.collectionId) { setBusy(false); return; }
     setBusy(true);
     resolveCollection(state.collectionId)
       .then((data) => {
@@ -49,13 +53,16 @@ export function LocalLibraryNode({
       .catch((reason) => { if (active) setError(errorMessage(reason)); })
       .finally(() => { if (active) setBusy(false); });
     return () => { active = false; };
-  }, [state.collectionId]);
+  }, [state.collectionId, refresh]);
 
   const change = (patch: Partial<LibraryNodeState>) => {
     if (locked) return;
     actions?.update(id, { text: encodeLibraryNode({ ...state, ...patch }) });
   };
   const current = collections.find((item) => item.id === state.collectionId);
+  const matching = resolved?.items.filter((item) =>
+    item.name.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase())
+  ) ?? [];
   return (
     <div className="cw-local-library nodrag nopan nowheel" onPointerDown={(event) => event.stopPropagation()}>
       <label className="cw-local-library-line">
@@ -84,6 +91,15 @@ export function LocalLibraryNode({
       {busy && <p className="cw-local-library-hint">{t("library.assets.loading")}</p>}
       {resolved && (
         <>
+          <div className="cw-local-library-search">
+            <input value={search} placeholder={t("library.search.placeholder")}
+              aria-label={t("library.search.label")}
+              onChange={(event) => { setSearch(event.target.value); setShown(12); }} />
+            <button type="button" onClick={() => setRefresh((value) => value + 1)}
+              aria-label={t("library.node.refresh")} title={t("library.node.refresh")}>
+              <CanvasIcon name="history" size={14} />
+            </button>
+          </div>
           <div className="cw-local-library-meta">
             <span>{state.mode === "fixed" ? resolved.items.filter((item) => state.itemIds.includes(item.id)).length : resolved.items.length} {t("library.node.files")}</span>
             {(state.mode === "fixed" ? state.itemIds.filter((id) => !resolved.items.some((item) => item.id === id)).length : resolved.unavailableIds.length) > 0 && (
@@ -93,7 +109,7 @@ export function LocalLibraryNode({
             )}
           </div>
           <div className="cw-local-library-grid">
-            {resolved.items.slice(0, 12).map((item) => (
+            {matching.slice(0, shown).map((item) => (
               <MediaCard key={item.id} title={item.name}
                 item={item.mediaKind === "image" || item.mediaKind === "video" || item.mediaKind === "audio" ? item : undefined}
                 icon={item.mediaKind ?? "file"}
@@ -107,8 +123,11 @@ export function LocalLibraryNode({
               />
             ))}
           </div>
-          {resolved.items.length > 12 && (
-            <p className="cw-local-library-hint">+{resolved.items.length - 12} {t("library.node.files")}</p>
+          {matching.length > shown && (
+            <button className="cw-local-library-more" type="button"
+              onClick={() => setShown((value) => value + 24)}>
+              {t("library.node.more")} (+{matching.length - shown})
+            </button>
           )}
           {state.mode === "fixed" && (
             <p className="cw-local-library-hint">{t("library.node.fixedHint")}</p>
