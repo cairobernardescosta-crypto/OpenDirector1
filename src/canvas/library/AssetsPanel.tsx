@@ -7,6 +7,7 @@ import {
   createCollection,
   deleteCollection,
   listCollections,
+  renameCollection,
   setCollectionItems,
   type LibraryCollection,
   listItems,
@@ -56,6 +57,8 @@ export function AssetsPanel({
   const [browseAll, setBrowseAll] = useState(false);
   const [newCollection, setNewCollection] = useState("");
   const [creatingCollection, setCreatingCollection] = useState(false);
+  const [renamingCollectionId, setRenamingCollectionId] = useState("");
+  const [renamedCollection, setRenamedCollection] = useState("");
   const currentCollection = collections.find((collection) => collection.id === collectionId);
   const visibleItems = currentCollection && !browseAll
     ? items.filter((item) => currentCollection.itemIds.includes(item.id))
@@ -68,7 +71,7 @@ export function AssetsPanel({
     }).catch((reason) => { if (active) setError(errorMessage(reason)); });
     return () => { active = false; };
   }, []);
-  const manageCollection = async (action: "create" | "add" | "remove" | "delete") => {
+  const manageCollection = async (action: "create" | "rename" | "add" | "remove" | "delete") => {
     setBusy(true);
     setError("");
     try {
@@ -80,6 +83,14 @@ export function AssetsPanel({
         setCollectionId(created.id);
         onNotice(t("library.collections.created"));
       } else if (currentCollection) {
+        if (action === "rename") {
+          await renameCollection(currentCollection.id, renamedCollection.trim());
+          setRenamingCollectionId("");
+          setRenamedCollection("");
+          await refreshCollections();
+          onNotice(t("library.collections.renamed"));
+          return;
+        }
         const ids = items.filter((item) => selected.has(item.id)).map((item) => item.id);
         if (action === "delete") {
           await deleteCollection(currentCollection.id);
@@ -207,7 +218,7 @@ export function AssetsPanel({
             aria-label={t("library.collections.label")}
             value={collectionId}
             disabled={disabled || busy}
-            onChange={(event) => { setCollectionId(event.target.value); setBrowseAll(false); onChanged(); }}
+            onChange={(event) => { setCollectionId(event.target.value); setBrowseAll(false); setRenamingCollectionId(""); onChanged(); }}
           >
             <option value="">{t("library.collections.all")}</option>
             {collections.map((entry) => (
@@ -227,6 +238,11 @@ export function AssetsPanel({
                 onClick={() => { setBrowseAll((value) => !value); onChanged(); }}>
                 {browseAll ? currentCollection.name : t("library.collections.browse")}
               </button>
+              <button type="button" disabled={disabled || busy}
+                onClick={() => {
+                  setRenamedCollection(currentCollection.name);
+                  setRenamingCollectionId(currentCollection.id);
+                }}>{t("library.collections.rename")}</button>
               <button type="button" disabled={disabled || busy || !selected.size}
                 onClick={() => void manageCollection("add")}>{t("library.collections.add")}</button>
               <button type="button" disabled={disabled || busy || !selected.size}
@@ -237,6 +253,23 @@ export function AssetsPanel({
           </details>
         )}
       </div>
+      {renamingCollectionId && currentCollection?.id === renamingCollectionId && (
+        <form className="cw-lib-collection-edit" onSubmit={(event) => {
+          event.preventDefault();
+          void manageCollection("rename");
+        }}>
+          <label htmlFor="cw-library-collection-rename">{t("library.collections.name")}</label>
+          <input id="cw-library-collection-rename" autoFocus
+            value={renamedCollection} maxLength={255} required disabled={disabled || busy}
+            onChange={(event) => setRenamedCollection(event.target.value)} />
+          <button type="submit" disabled={disabled || busy || !renamedCollection.trim() ||
+            renamedCollection.trim() === currentCollection.name}>{t("library.collections.saveName")}</button>
+          <button type="button" disabled={busy}
+            onClick={() => { setRenamingCollectionId(""); setRenamedCollection(""); }}>
+            {t("library.collections.cancel")}
+          </button>
+        </form>
+      )}
       {creatingCollection && (
         <form className="cw-lib-tabs" onSubmit={(event) => { event.preventDefault(); void manageCollection("create"); }}>
           <input aria-label={t("library.collections.name")} placeholder={t("library.collections.name")}
