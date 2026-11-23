@@ -21,6 +21,7 @@ export const library = {
   "library.node.chooseSource": "Selecione uma mídia na Biblioteca local antes de puxar o fio.",
   "library.node.invalidSource": "A mídia selecionada não está disponível ou não corresponde ao tipo escolhido.",
   "library.node.importedSource": "Mídia importada como nó independente. Agora use a seta desse nó para conectar a outros cards.",
+  "library.node.connectedSource": "Mídia importada como nó nativo e conectada ao card de destino.",
   "library.node.extract": "Adicionar mídia como nó no canvas",
   "library.node.active": "Fonte selecionada para criar um nó conectado",
   "library.node.more": "Mostrar mais",
