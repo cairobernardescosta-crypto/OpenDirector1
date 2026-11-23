@@ -16,6 +16,8 @@ export const library = {
   "library.node.missing": "indisponíveis",
   "library.node.fixedHint": "Selecione os arquivos a manter como referências fixas.",
   "library.node.readOnly": "Referências somente para leitura",
+  "library.node.refresh": "Atualizar referências",
+  "library.node.more": "Mostrar mais",
   "library.collections.rename": "Renomear coleção",
   "library.collections.renamed": "Nome da coleção atualizado.",
   "library.collections.saveName": "Salvar nome",
