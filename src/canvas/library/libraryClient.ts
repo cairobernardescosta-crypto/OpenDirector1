@@ -393,6 +393,24 @@ export async function listCollections(
   );
 }
 
+/** Stable, read-only material references for a future native library node.
+ * Unavailable (trashed/missing) assets are never silently replaced. */
+export type LibraryCollectionResolution = {
+  collectionId: string;
+  collectionName: string;
+  itemIds: string[];
+  items: LibraryItem[];
+  unavailableIds: string[];
+};
+
+export async function resolveCollection(
+  id: string,
+): Promise<LibraryCollectionResolution> {
+  return request<LibraryCollectionResolution>(
+    `/library/collections/${encodeURIComponent(id)}/resolve`,
+  );
+}
+
 export async function createCollection(name: string): Promise<LibraryCollection> {
   return changed(await request<LibraryCollection>("/library/collections", {
     method: "POST",
