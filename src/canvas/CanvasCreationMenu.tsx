@@ -96,14 +96,14 @@ export function CreationMenuContent({
           <span>{t("canvasNodes.kind.file")}</span>
         </button>
       )}
+      {onCreateLibrary && (
+        <button role="menuitem" onClick={onCreateLibrary}>
+          <CanvasIcon name="rail-folder" size={18} />
+          <span>{t("library.node.title")}</span>
+        </button>
+      )}
       {!allowedKinds && (
         <>
-          {onCreateLibrary && (
-            <button role="menuitem" onClick={onCreateLibrary}>
-              <CanvasIcon name="rail-folder" size={18} />
-              <span>{t("library.node.title")}</span>
-            </button>
-          )}
           <hr />
           <button role="menuitem" onClick={onAssets}>
             <CanvasIcon name="rail-folder" size={18} />
