@@ -141,15 +141,41 @@ export function AssetsPanel({
 
   const upload = async (files: FileList | null) => {
     if (!files?.length) return;
+    // Capture the destination before the asynchronous uploads begin.
+    // The global library remains the only owner of the media bytes.
+    const destinationId = collectionId;
+    const uploaded: string[] = [];
     setError("");
     setBusy(true);
     try {
-      for (const file of Array.from(files)) await uploadItem(file);
-      onNotice(t("library.assets.uploaded", { count: files.length }));
-      onChanged();
+      for (const file of Array.from(files)) {
+        const item = await uploadItem(file);
+        uploaded.push(item.id);
+      }
     } catch (reason) {
       setError(errorMessage(reason));
     } finally {
+      // Even a partially completed batch must keep its successful imports.
+      // Associate the uploaded IDs with the selected collection, not just
+      // with the all-files library. Never reupload to create a collection copy.
+      if (destinationId && uploaded.length) {
+        try {
+          const latest = (await listCollections({ fresh: true }))
+            .find((entry) => entry.id === destinationId);
+          if (!latest) throw new Error(t("library.collections.unavailable"));
+          await setCollectionItems(destinationId, [
+            ...new Set([...latest.itemIds, ...uploaded]),
+          ]);
+          await refreshCollections();
+        } catch (reason) {
+          // Upload succeeded; keep the files in All Files if linking fails.
+          setError(errorMessage(reason));
+        }
+      }
+      if (uploaded.length) {
+        onNotice(t("library.assets.uploaded", { count: uploaded.length }));
+        onChanged();
+      }
       setBusy(false);
       if (input.current) input.current.value = "";
     }
