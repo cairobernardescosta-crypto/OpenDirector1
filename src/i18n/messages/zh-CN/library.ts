@@ -21,6 +21,7 @@ export const library = {
   "library.node.chooseSource": "拖动连线前请先在本地素材库中选择素材。",
   "library.node.invalidSource": "所选素材不可用或与所选类型不匹配。",
   "library.node.importedSource": "素材已作为独立节点导入。请使用该节点的箭头连接其他节点。",
+  "library.node.connectedSource": "素材已作为原生节点导入并连接到目标节点。",
   "library.node.extract": "作为画布节点添加素材",
   "library.node.active": "已选择用于新建节点的素材",
   "library.node.more": "显示更多",
