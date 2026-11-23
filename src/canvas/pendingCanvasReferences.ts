@@ -1,6 +1,7 @@
 import { RULE_FACTS } from "../contracts/ruleFacts.generated.ts";
 import type { CanvasNode } from "./model.ts";
 import { assistantReferences } from "./assistantReferences.ts";
+import { isLibraryNodeText } from "./library/libraryNodeState.ts";
 import type { ReferenceInput } from "../backend/generation.ts";
 import { tNow } from "../i18n/messages.ts";
 
@@ -25,9 +26,8 @@ export function pendingCanvasReferences(
   return [...new Map(nodes.map((node) => [node.id, node])).values()].map(
     (node) => {
       const data = node.data;
-      const supported = ["text", "image", "video", "audio", "subject"].includes(
-        node.type,
-      );
+      const supported = !isLibraryNodeText(data.text) &&
+        ["text", "image", "video", "audio", "subject"].includes(node.type);
       const available =
         node.type === "text"
           ? Boolean(data.text?.trim())
