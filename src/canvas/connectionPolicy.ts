@@ -68,7 +68,10 @@ export function referenceMaterial(node: CanvasNode): string | null {
 
 /** Empty generation nodes keep their ports; assets need readable material. */
 export function canStartReference(node: CanvasNode): boolean {
-  if (node.type === "text" && isLibraryNodeText(node.data.text)) return false;
+  // Library cards may start a creation gesture, but never supply their
+  // serialized manifest as a generator reference edge. The menu imports the
+  // selected file as a separate native project-owned media node instead.
+  if (node.type === "text" && isLibraryNodeText(node.data.text)) return true;
   return (
     Boolean(nodeDownstreamKinds(node).length) &&
     (node.data.mediaRole !== "asset" || Boolean(referenceMaterial(node)))
