@@ -40,3 +40,11 @@
   padding: 6px 8px; cursor: pointer;
 }
 .cw-local-library-more { width: 100%; font-size: 11px; }
+
+.cw-local-library-search select {
+  flex: 0 1 80px; min-width: 60px; max-width: 96px;
+  padding: 6px 3px;
+  color: inherit; border: 1px solid var(--cw-lib-input-border, #3b3e42);
+  border-radius: 7px; background: var(--cw-lib-input, #191c1f);
+  font-size: 11px;
+}
