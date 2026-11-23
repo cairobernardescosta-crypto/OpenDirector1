@@ -29,6 +29,21 @@ As referências de mídia para geração/IA **ainda não são conectáveis diret
 4. **Conexões seguras:** referências devem ser resolvidas em ativos **individuais** e compatíveis (imagem/vídeo/áudio/texto). Uma coleção nunca deve ser reinterpretada como uma única imagem ou um link de mídia; respeitar `connectionPolicy`, capacidade do destino e autorização de acesso. Fase 7 controlará fornecimento ao Gemini.
 5. **Proteções:** bloqueio, duplicação, remoção do nó sem remover mídia, permissões, tamanho máximo, coleção excluída e alterações concorrentes.
 
+## Fase 6.1 — correções de interface, gesto e origem de mídia
+
+Na branch `dev`, foram adicionadas as seguintes correções (ainda **não validadas no Windows**):
+
+- Retirado `nodrag nopan` do contêiner inteiro do card. Controles interativos mantêm seus cliques, e o restante da superfície volta a participar do arraste padrão do canvas.
+- A origem Biblioteca local participa dos gestos nativos de conexão e mostra a seta de saída; o menu ao puxar para o canvas oferece os tipos de mídia compatíveis com a seleção.
+- Arquivos são selecionados explicitamente pelo usuário no card. `activeItemId` e `activeMediaKind` são preservados no manifesto versionado; os ativos reais são sempre verificados novamente pelo backend.
+- O botão de extração e o menu de arrastar importam mídias como nós nativos independentes por meio de `insertLibraryItems`, preservando bytes e controle de tipo do projeto.
+- Ao arrastar até um nó de geração compatível, um nó de mídia nativo é importado e **a conexão real é criada do nó de mídia para o destino** após validação de `referenceIssue`. Não existe conexão fictícia do manifesto da coleção para um gerador.
+- `mergeImportedLibraryMedia` preserva a nova conexão após persistência, sem restaurar conexões para destinos removidos e sem criar arestas para o manifesto.
+- Ocultei o indicador de versões do nó de texto que se sobrepunha ao seletor do card de biblioteca, e melhorei largura, miniaturas e rolagem sem alterar os demais tipos de card.
+- Novos testes de referência, serialização, extração e merge em `tests/localLibraryNode.test.ts` e `tests/localLibraryImportMerge.test.ts`.
+
+**Limite consciente:** a coleção permanece implementada como um card especializado sobre o contrato nativo de nó de texto, e não como um novo `CanvasKind` Python. O transporte das mídias funciona criando um nó nativo de imagem/vídeo/áudio/arquivo; conectar diretamente vários arquivos da coleção a uma única porta sem nós intermediários permanece pendente de uma migração de esquema mais profunda.
+
 ## Portões de regressão antes de atualizar o Windows
 
 - `npm run check:i18n`, `npm test`, `npm run build`
