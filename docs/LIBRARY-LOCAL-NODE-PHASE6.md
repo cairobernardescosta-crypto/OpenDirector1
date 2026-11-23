@@ -1,8 +1,10 @@
 # Fase 6 — Biblioteca local: contrato de implementação segura
 
-## Estado (2026-11-22)
+## Estado (2026-11-22) — 6B em validação
 
-**Parte 6A implementada na branch dev:** resolução de referências de coleções para um futuro nó nativo. O novo tipo de nó **ainda não foi registrado ou exposto no canvas**: apresentar esse card apenas no React sem suporte dos contratos Python quebraria a persistência ao reabrir o projeto.
+**Parte 6A e interface 6B implementadas na branch dev:** resolução de referências e card visual **Biblioteca local** disponível no menu de novos nós e na barra lateral. Para preservar os contratos Python nativos, o estado versionado da coleção é armazenado por um **nó de texto nativo especializado**, não por um novo `CanvasKind` no backend. A interface o renderiza como card de biblioteca. Essa compatibilidade deve ser mantida até uma futura migração de esquema completa.
+
+As referências de mídia para geração/IA **ainda não são conectáveis diretamente**. O conteúdo serializado é intencionalmente bloqueado nas conexões para que nunca seja enviado como prompt, imagem ou vídeo indevido. A integração executável com outros nós permanece pendente.
 
 ## Implementado
 
@@ -12,11 +14,18 @@
 - Cliente TypeScript tipado `resolveCollection(id, fixedItemIds?)`.
 - Testes em `tests/test_library.py`: coleção válida, arquivos removidos, seleção fixa, IDs estranhos e ausência de efeito colateral.
 
+## Implementação visual 6B no GitHub
+
+- Card `LocalLibraryNode` no `NodeFrame`, criação pelo menu e barra de ferramentas, coleção selecionável, modo fixo/dinâmico, miniaturas autenticadas, pesquisa, filtro e atualização manual.
+- Estado `opendirector:local-library:v1:` com parser rigoroso; salvamento no contrato de texto já suportado pelo backend.
+- Restrição de conexões do card enquanto os ativos não puderem ser transmitidos individualmente aos nós nativos.
+- Testes de serialização e isolamento em `tests/localLibraryNode.test.ts`.
+
 ## Pendências para concluir a Fase 6
 
 1. **Contrato persistente:** criar `LibraryCanvasItem` (com `collectionId`, modo `fixed|dynamic`, `itemIds`) na camada Python `domain/creation/canvas.py`, e atualizar em conjunto criação, comandos, projeção e schemas gerados. Não apenas adicionar o tipo no React.
 2. **Modelo do canvas:** introduzir o tipo correspondente em `CanvasNodeKind`, `dataBoundary`, operações, cópia, undo/redo, importação/exportação, numeração de títulos e layout, mantendo os nós antigos intactos.
-3. **Nó nativo:** novo componente sob `NodeFrame`; seleção de coleção, escolha de mídia, filtros, prévias, modos fixo/dinâmico e avisos sobre itens indisponíveis.
+3. **Validação do nó visual:** compilar, testar e abrir localmente para confirmar seleção de coleção, escolha de mídia, filtros, prévias, modos fixo/dinâmico, reinicialização e avisos sobre itens indisponíveis.
 4. **Conexões seguras:** referências devem ser resolvidas em ativos **individuais** e compatíveis (imagem/vídeo/áudio/texto). Uma coleção nunca deve ser reinterpretada como uma única imagem ou um link de mídia; respeitar `connectionPolicy`, capacidade do destino e autorização de acesso. Fase 7 controlará fornecimento ao Gemini.
 5. **Proteções:** bloqueio, duplicação, remoção do nó sem remover mídia, permissões, tamanho máximo, coleção excluída e alterações concorrentes.
 
