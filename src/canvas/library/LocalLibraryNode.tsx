@@ -70,7 +70,7 @@ export function LocalLibraryNode({
       <label className="cw-local-library-line">
         <span>{t("library.node.collection")}</span>
         <select value={state.collectionId} disabled={locked || busy}
-          onChange={(event) => change({ collectionId: event.target.value, itemIds: [], activeItemId: undefined })}>
+          onChange={(event) => change({ collectionId: event.target.value, itemIds: [], activeItemId: undefined, activeMediaKind: undefined })}>
           <option value="">{t("library.node.choose")}</option>
           {collections.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}
           {state.collectionId && !current &&
@@ -127,6 +127,7 @@ export function LocalLibraryNode({
                 selected={state.mode === "fixed" ? state.itemIds.includes(item.id) : state.activeItemId === item.id}
                 onOpen={() => change({
                   activeItemId: item.id,
+                  activeMediaKind: item.mediaKind ?? "file",
                   ...(state.mode === "fixed" && !state.itemIds.includes(item.id)
                     ? { itemIds: [...state.itemIds, item.id].slice(0, 1000) }
                     : {}),
