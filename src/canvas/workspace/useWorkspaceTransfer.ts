@@ -39,6 +39,7 @@ import {
   type ClipboardMedia,
 } from "../clipboardMedia.ts";
 import { resourceNodeData } from "../projectAssets";
+import { mergeImportedLibraryMedia } from "../library/libraryImportMerge.ts";
 import { persistCurrentDocument } from "../projectManagement";
 import { measureSubjectNodeHeight } from "../subjectLayoutMeasurement.ts";
 import {
@@ -145,19 +146,7 @@ export function useWorkspaceTransfer(rt: WorkspaceRuntime) {
     if (!(await persist(next)))
       throw new Error(saveError.current || t("canvas.workspace.error.importUnsaved"));
     if (historyRef.current.present.id !== current.id) return;
-    change((latest) => {
-      const merged = mergeLibrarySubjectImport(latest, current, next);
-      if (!targetNodeId) return merged;
-      const connected = next.edges.find(
-        (edge) => edge.source === node.id && edge.target === targetNodeId,
-      );
-      if (!connected ||
-          merged.edges.some((edge) => edge.id === connected.id) ||
-          !merged.nodes.some((item) => item.id === targetNodeId) ||
-          referenceIssue(merged, node.id, targetNodeId))
-        return merged;
-      return { ...merged, edges: [...merged.edges, connected] };
-    });
+    change((latest) => mergeImportedLibraryMedia(latest, current, next, node.id, targetNodeId));
     setSelected([node.id]);
     referenceTarget.current = null;
     setPanel(null);
