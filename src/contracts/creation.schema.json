@@ -1966,7 +1966,8 @@
                 "text": "#/$defs/TextCanvasItem",
                 "timeline": "#/$defs/TimelineCanvasItem",
                 "tool": "#/$defs/ToolCanvasItem",
-                "video": "#/$defs/VideoCanvasItem"
+                "video": "#/$defs/VideoCanvasItem",
+                "library": "#/$defs/LibraryCanvasItem"
               },
               "propertyName": "kind"
             },
@@ -2000,6 +2001,9 @@
               },
               {
                 "$ref": "#/$defs/DirectorCanvasItem"
+              },
+              {
+                "$ref": "#/$defs/LibraryCanvasItem"
               },
               {
                 "$ref": "#/$defs/GroupCanvasItem"
@@ -18291,7 +18295,8 @@
                 "text": "#/$defs/TextCanvasItem",
                 "timeline": "#/$defs/TimelineCanvasItem",
                 "tool": "#/$defs/ToolCanvasItem",
-                "video": "#/$defs/VideoCanvasItem"
+                "video": "#/$defs/VideoCanvasItem",
+                "library": "#/$defs/LibraryCanvasItem"
               },
               "propertyName": "kind"
             },
@@ -18325,6 +18330,9 @@
               },
               {
                 "$ref": "#/$defs/DirectorCanvasItem"
+              },
+              {
+                "$ref": "#/$defs/LibraryCanvasItem"
               },
               {
                 "$ref": "#/$defs/GroupCanvasItem"
