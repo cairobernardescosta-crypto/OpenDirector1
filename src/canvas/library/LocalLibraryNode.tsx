@@ -71,7 +71,8 @@ export function LocalLibraryNode({
     <div className="cw-local-library nowheel" onDoubleClick={(event) => event.stopPropagation()}>
       <label className="cw-local-library-line">
         <span>{t("library.node.collection")}</span>
-        <select value={state.collectionId} disabled={locked || busy}
+        <select className="nodrag nopan nowheel" value={state.collectionId} disabled={locked || busy}
+          onPointerDown={(event) => event.stopPropagation()}
           onChange={(event) => change({ collectionId: event.target.value, itemIds: [], activeItemId: undefined, activeMediaKind: undefined })}>
           <option value="">{t("library.node.choose")}</option>
           {collections.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}
@@ -81,7 +82,8 @@ export function LocalLibraryNode({
       </label>
       <label className="cw-local-library-line">
         <span>{t("library.node.mode")}</span>
-        <select value={state.mode} disabled={locked || !state.collectionId}
+        <select className="nodrag nopan nowheel" value={state.mode} disabled={locked || !state.collectionId}
+          onPointerDown={(event) => event.stopPropagation()}
           onChange={(event) => change({
             mode: event.target.value === "fixed" ? "fixed" : "dynamic",
             itemIds: event.target.value === "fixed" ? resolved?.items.slice(0, 1000).map((item) => item.id) ?? state.itemIds : [],
@@ -96,10 +98,12 @@ export function LocalLibraryNode({
       {resolved && (
         <>
           <div className="cw-local-library-search">
-            <input value={search} placeholder={t("library.search.placeholder")}
+            <input className="nodrag nopan nowheel" value={search} placeholder={t("library.search.placeholder")}
               aria-label={t("library.search.label")}
+              onPointerDown={(event) => event.stopPropagation()}
               onChange={(event) => { setSearch(event.target.value); setShown(12); }} />
-            <select value={mediaFilter} aria-label={t("library.node.filter")}
+            <select className="nodrag nopan nowheel" value={mediaFilter} aria-label={t("library.node.filter")}
+              onPointerDown={(event) => event.stopPropagation()}
               onChange={(event) => { setMediaFilter(event.target.value as LibraryMediaKind | ""); setShown(12); }}>
               <option value="">{t("library.all")}</option>
               <option value="image">{t("library.category.image")}</option>
@@ -107,7 +111,9 @@ export function LocalLibraryNode({
               <option value="audio">{t("library.category.audio")}</option>
               <option value="file">{t("library.category.file")}</option>
             </select>
-            <button type="button" onClick={() => setRefresh((value) => value + 1)}
+            <button type="button" className="nodrag nopan nowheel"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={() => setRefresh((value) => value + 1)}
               aria-label={t("library.node.refresh")} title={t("library.node.refresh")}>
               <CanvasIcon name="history" size={14} />
             </button>
@@ -122,7 +128,8 @@ export function LocalLibraryNode({
           </div>
           <div className="cw-local-library-grid">
             {matching.slice(0, shown).map((item) => (
-              <MediaCard key={item.id} title={item.name}
+              <div key={item.id} className="nodrag nopan nowheel">
+              <MediaCard title={item.name}
                 item={item.mediaKind === "image" || item.mediaKind === "video" || item.mediaKind === "audio" ? item : undefined}
                 icon={item.mediaKind ?? "file"}
                 selectable={state.mode === "fixed" && !locked}
@@ -165,13 +172,15 @@ export function LocalLibraryNode({
                     : [...state.itemIds, item.id].slice(0, 1000),
                 })}
               />
+              </div>
             ))}
           </div>
           {state.activeItemId && (
             <p className="cw-local-library-hint">{t("library.node.active")}: {resolved.items.find((item) => item.id === state.activeItemId)?.name ?? t("library.node.unavailable")}</p>
           )}
           {matching.length > shown && (
-            <button className="cw-local-library-more" type="button"
+            <button className="cw-local-library-more nodrag nopan nowheel" type="button"
+              onPointerDown={(event) => event.stopPropagation()}
               onClick={() => setShown((value) => value + 24)}>
               {t("library.node.more")} (+{matching.length - shown})
             </button>
