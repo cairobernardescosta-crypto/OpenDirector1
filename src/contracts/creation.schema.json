@@ -2410,6 +2410,7 @@
               "video",
               "audio",
               "file",
+              "library",
               "group",
               "timeline",
               "subject",
@@ -3076,7 +3077,8 @@
                 "text": "#/$defs/TextCanvasItem",
                 "timeline": "#/$defs/TimelineCanvasItem",
                 "tool": "#/$defs/ToolCanvasItem",
-                "video": "#/$defs/VideoCanvasItem"
+                "video": "#/$defs/VideoCanvasItem",
+                "library": "#/$defs/LibraryCanvasItem"
               },
               "propertyName": "kind"
             },
@@ -3110,6 +3112,9 @@
               },
               {
                 "$ref": "#/$defs/DirectorCanvasItem"
+              },
+              {
+                "$ref": "#/$defs/LibraryCanvasItem"
               },
               {
                 "$ref": "#/$defs/GroupCanvasItem"
@@ -3919,7 +3924,8 @@
                 "text": "#/$defs/TextCanvasItem",
                 "timeline": "#/$defs/TimelineCanvasItem",
                 "tool": "#/$defs/ToolCanvasItem",
-                "video": "#/$defs/VideoCanvasItem"
+                "video": "#/$defs/VideoCanvasItem",
+                "library": "#/$defs/LibraryCanvasItem"
               },
               "propertyName": "kind"
             },
@@ -3953,6 +3959,9 @@
               },
               {
                 "$ref": "#/$defs/DirectorCanvasItem"
+              },
+              {
+                "$ref": "#/$defs/LibraryCanvasItem"
               },
               {
                 "$ref": "#/$defs/GroupCanvasItem"
@@ -4017,7 +4026,8 @@
                 "stack": "#/$defs/StackDocument",
                 "subject": "#/$defs/SubjectDocument",
                 "timeline": "#/$defs/TimelineDocument",
-                "tool": "#/$defs/ToolDocument"
+                "tool": "#/$defs/ToolDocument",
+                "library": "#/$defs/LibraryDocument"
               },
               "propertyName": "kind"
             },
@@ -4042,6 +4052,9 @@
               },
               {
                 "$ref": "#/$defs/DirectorDocument"
+              },
+              {
+                "$ref": "#/$defs/LibraryDocument"
               },
               {
                 "$ref": "#/$defs/MediaEditDocument"
@@ -5006,6 +5019,7 @@
               "stack",
               "tool",
               "director",
+              "library",
               "layers",
               "image_crop",
               "media_edit"
@@ -5116,7 +5130,8 @@
                 "stack": "#/$defs/StackDocument",
                 "subject": "#/$defs/SubjectDocument",
                 "timeline": "#/$defs/TimelineDocument",
-                "tool": "#/$defs/ToolDocument"
+                "tool": "#/$defs/ToolDocument",
+                "library": "#/$defs/LibraryDocument"
               },
               "propertyName": "kind"
             },
@@ -5141,6 +5156,9 @@
               },
               {
                 "$ref": "#/$defs/DirectorDocument"
+              },
+              {
+                "$ref": "#/$defs/LibraryDocument"
               },
               {
                 "$ref": "#/$defs/MediaEditDocument"
@@ -7993,6 +8011,265 @@
         "title": "LayerDocument",
         "type": "object"
       },
+      "LibraryCanvasItem": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Stable identity of this project-owned object.",
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "projectId": {
+            "description": "Owning project ID.",
+            "format": "uuid",
+            "title": "Projectid",
+            "type": "string"
+          },
+          "revision": {
+            "default": 1,
+            "description": "Current object revision for optimistic concurrency.",
+            "minimum": 1,
+            "title": "Revision",
+            "type": "integer"
+          },
+          "kind": {
+            "const": "library",
+            "description": "Business object or media type.",
+            "title": "Kind",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "description": "User-visible title.",
+            "maxLength": 255,
+            "title": "Title",
+            "type": "string"
+          },
+          "position": {
+            "$ref": "#/$defs/Point",
+            "description": "Position in the owning canvas or stage."
+          },
+          "width": {
+            "default": 352,
+            "description": "Width in pixels.",
+            "exclusiveMinimum": 0,
+            "title": "Width",
+            "type": "number"
+          },
+          "height": {
+            "default": 198,
+            "description": "Height in pixels.",
+            "exclusiveMinimum": 0,
+            "title": "Height",
+            "type": "number"
+          },
+          "zIndex": {
+            "default": 0,
+            "description": "Canvas stacking order.",
+            "title": "Zindex",
+            "type": "integer"
+          },
+          "locked": {
+            "default": false,
+            "description": "Whether edits to this object are blocked.",
+            "title": "Locked",
+            "type": "boolean"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "pattern": "^(#[0-9a-fA-F]{6})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Group background color in #RRGGBB format.",
+            "title": "Color"
+          },
+          "visible": {
+            "default": true,
+            "description": "Whether this object is displayed.",
+            "title": "Visible",
+            "type": "boolean"
+          },
+          "parentId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Parent canvas group ID, or null for the root.",
+            "title": "Parentid"
+          },
+          "tags": {
+            "default": [],
+            "description": "User-defined search tags.",
+            "items": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
+          "binding": {
+            "$ref": "#/$defs/EditorBinding",
+            "description": "Business object displayed by this canvas item."
+          }
+        },
+        "required": [
+          "id",
+          "projectId",
+          "kind",
+          "binding"
+        ],
+        "title": "LibraryCanvasItem",
+        "type": "object"
+      },
+      "LibraryData": {
+        "additionalProperties": false,
+        "properties": {
+          "collectionId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Selected local library collection, or null when none is selected.",
+            "title": "Collectionid"
+          },
+          "mode": {
+            "default": "dynamic",
+            "description": "Whether the node follows the collection or retains an explicit selection.",
+            "enum": [
+              "dynamic",
+              "fixed"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "itemIds": {
+            "default": [],
+            "description": "Ordered selected media IDs for fixed mode.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 1000,
+            "title": "Itemids",
+            "type": "array"
+          },
+          "activeItemId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Currently focused media item, independent of the fixed selection.",
+            "title": "Activeitemid"
+          },
+          "activeMediaKind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "image",
+                  "video",
+                  "audio",
+                  "file"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Media kind of the focused item.",
+            "title": "Activemediakind"
+          }
+        },
+        "required": [],
+        "title": "LibraryData",
+        "type": "object"
+      },
+      "LibraryDocument": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Stable identity of this project-owned object.",
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "projectId": {
+            "description": "Owning project ID.",
+            "format": "uuid",
+            "title": "Projectid",
+            "type": "string"
+          },
+          "revision": {
+            "default": 1,
+            "description": "Current object revision for optimistic concurrency.",
+            "minimum": 1,
+            "title": "Revision",
+            "type": "integer"
+          },
+          "schemaVersion": {
+            "const": 1,
+            "default": 1,
+            "description": "Record schema version.",
+            "title": "Schemaversion",
+            "type": "integer"
+          },
+          "inputConnections": {
+            "default": [],
+            "description": "Persisted connections to source assets.",
+            "items": {
+              "$ref": "#/$defs/EditorInputConnection"
+            },
+            "title": "Inputconnections",
+            "type": "array"
+          },
+          "kind": {
+            "const": "library",
+            "description": "Business object or media type.",
+            "title": "Kind",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/$defs/LibraryData",
+            "description": "Typed editable document contents."
+          }
+        },
+        "required": [
+          "id",
+          "projectId",
+          "kind",
+          "data"
+        ],
+        "title": "LibraryDocument",
+        "type": "object"
+      },
       "MaskStroke": {
         "additionalProperties": false,
         "properties": {
@@ -10389,7 +10666,8 @@
                   "text": "#/$defs/TextCanvasItem",
                   "timeline": "#/$defs/TimelineCanvasItem",
                   "tool": "#/$defs/ToolCanvasItem",
-                  "video": "#/$defs/VideoCanvasItem"
+                  "video": "#/$defs/VideoCanvasItem",
+                  "library": "#/$defs/LibraryCanvasItem"
                 },
                 "propertyName": "kind"
               },
@@ -10425,6 +10703,9 @@
                   "$ref": "#/$defs/DirectorCanvasItem"
                 },
                 {
+                  "$ref": "#/$defs/LibraryCanvasItem"
+                },
+                {
                   "$ref": "#/$defs/GroupCanvasItem"
                 }
               ]
@@ -10445,7 +10726,8 @@
                   "stack": "#/$defs/StackDocument",
                   "subject": "#/$defs/SubjectDocument",
                   "timeline": "#/$defs/TimelineDocument",
-                  "tool": "#/$defs/ToolDocument"
+                  "tool": "#/$defs/ToolDocument",
+                  "library": "#/$defs/LibraryDocument"
                 },
                 "propertyName": "kind"
               },
@@ -10470,6 +10752,9 @@
                 },
                 {
                   "$ref": "#/$defs/DirectorDocument"
+                },
+                {
+                  "$ref": "#/$defs/LibraryDocument"
                 },
                 {
                   "$ref": "#/$defs/MediaEditDocument"
@@ -15191,6 +15476,33 @@
         "title": "VideoParameters",
         "type": "object"
       },
+      "Viewport": {
+        "additionalProperties": false,
+        "properties": {
+          "x": {
+            "default": 0,
+            "description": "Horizontal coordinate.",
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "default": 0,
+            "description": "Vertical coordinate.",
+            "title": "Y",
+            "type": "number"
+          },
+          "zoom": {
+            "default": 1,
+            "description": "Canvas viewport zoom factor.",
+            "maximum": 8,
+            "minimum": 0.08,
+            "title": "Zoom",
+            "type": "number"
+          }
+        },
+        "title": "Viewport",
+        "type": "object"
+      },
       "ViewState": {
         "additionalProperties": false,
         "properties": {
@@ -15262,33 +15574,6 @@
           "clientId"
         ],
         "title": "ViewState",
-        "type": "object"
-      },
-      "Viewport": {
-        "additionalProperties": false,
-        "properties": {
-          "x": {
-            "default": 0,
-            "description": "Horizontal coordinate.",
-            "title": "X",
-            "type": "number"
-          },
-          "y": {
-            "default": 0,
-            "description": "Vertical coordinate.",
-            "title": "Y",
-            "type": "number"
-          },
-          "zoom": {
-            "default": 1,
-            "description": "Canvas viewport zoom factor.",
-            "maximum": 8,
-            "minimum": 0.08,
-            "title": "Zoom",
-            "type": "number"
-          }
-        },
-        "title": "Viewport",
         "type": "object"
       },
       "VoiceLibraryCapabilities": {
@@ -18459,6 +18744,7 @@
               "video",
               "audio",
               "file",
+              "library",
               "group",
               "timeline",
               "subject",
@@ -19150,7 +19436,8 @@
                 "text": "#/$defs/TextCanvasItem",
                 "timeline": "#/$defs/TimelineCanvasItem",
                 "tool": "#/$defs/ToolCanvasItem",
-                "video": "#/$defs/VideoCanvasItem"
+                "video": "#/$defs/VideoCanvasItem",
+                "library": "#/$defs/LibraryCanvasItem"
               },
               "propertyName": "kind"
             },
@@ -19184,6 +19471,9 @@
               },
               {
                 "$ref": "#/$defs/DirectorCanvasItem"
+              },
+              {
+                "$ref": "#/$defs/LibraryCanvasItem"
               },
               {
                 "$ref": "#/$defs/GroupCanvasItem"
@@ -20013,7 +20303,8 @@
                 "text": "#/$defs/TextCanvasItem",
                 "timeline": "#/$defs/TimelineCanvasItem",
                 "tool": "#/$defs/ToolCanvasItem",
-                "video": "#/$defs/VideoCanvasItem"
+                "video": "#/$defs/VideoCanvasItem",
+                "library": "#/$defs/LibraryCanvasItem"
               },
               "propertyName": "kind"
             },
@@ -20047,6 +20338,9 @@
               },
               {
                 "$ref": "#/$defs/DirectorCanvasItem"
+              },
+              {
+                "$ref": "#/$defs/LibraryCanvasItem"
               },
               {
                 "$ref": "#/$defs/GroupCanvasItem"
@@ -20111,7 +20405,8 @@
                 "stack": "#/$defs/StackDocument",
                 "subject": "#/$defs/SubjectDocument",
                 "timeline": "#/$defs/TimelineDocument",
-                "tool": "#/$defs/ToolDocument"
+                "tool": "#/$defs/ToolDocument",
+                "library": "#/$defs/LibraryDocument"
               },
               "propertyName": "kind"
             },
@@ -20136,6 +20431,9 @@
               },
               {
                 "$ref": "#/$defs/DirectorDocument"
+              },
+              {
+                "$ref": "#/$defs/LibraryDocument"
               },
               {
                 "$ref": "#/$defs/MediaEditDocument"
@@ -21133,6 +21431,7 @@
               "stack",
               "tool",
               "director",
+              "library",
               "layers",
               "image_crop",
               "media_edit"
@@ -21246,7 +21545,8 @@
                 "stack": "#/$defs/StackDocument",
                 "subject": "#/$defs/SubjectDocument",
                 "timeline": "#/$defs/TimelineDocument",
-                "tool": "#/$defs/ToolDocument"
+                "tool": "#/$defs/ToolDocument",
+                "library": "#/$defs/LibraryDocument"
               },
               "propertyName": "kind"
             },
@@ -21271,6 +21571,9 @@
               },
               {
                 "$ref": "#/$defs/DirectorDocument"
+              },
+              {
+                "$ref": "#/$defs/LibraryDocument"
               },
               {
                 "$ref": "#/$defs/MediaEditDocument"
@@ -24264,6 +24567,284 @@
         "title": "LayerDocument",
         "type": "object"
       },
+      "LibraryCanvasItem": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Stable identity of this project-owned object.",
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "projectId": {
+            "description": "Owning project ID.",
+            "format": "uuid",
+            "title": "Projectid",
+            "type": "string"
+          },
+          "revision": {
+            "default": 1,
+            "description": "Current object revision for optimistic concurrency.",
+            "minimum": 1,
+            "title": "Revision",
+            "type": "integer"
+          },
+          "kind": {
+            "const": "library",
+            "description": "Business object or media type.",
+            "title": "Kind",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "description": "User-visible title.",
+            "maxLength": 255,
+            "title": "Title",
+            "type": "string"
+          },
+          "position": {
+            "$ref": "#/$defs/Point",
+            "description": "Position in the owning canvas or stage."
+          },
+          "width": {
+            "default": 352,
+            "description": "Width in pixels.",
+            "exclusiveMinimum": 0,
+            "title": "Width",
+            "type": "number"
+          },
+          "height": {
+            "default": 198,
+            "description": "Height in pixels.",
+            "exclusiveMinimum": 0,
+            "title": "Height",
+            "type": "number"
+          },
+          "zIndex": {
+            "default": 0,
+            "description": "Canvas stacking order.",
+            "title": "Zindex",
+            "type": "integer"
+          },
+          "locked": {
+            "default": false,
+            "description": "Whether edits to this object are blocked.",
+            "title": "Locked",
+            "type": "boolean"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "pattern": "^(#[0-9a-fA-F]{6})?$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Group background color in #RRGGBB format.",
+            "title": "Color"
+          },
+          "visible": {
+            "default": true,
+            "description": "Whether this object is displayed.",
+            "title": "Visible",
+            "type": "boolean"
+          },
+          "parentId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Parent canvas group ID, or null for the root.",
+            "title": "Parentid"
+          },
+          "tags": {
+            "default": [],
+            "description": "User-defined search tags.",
+            "items": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
+          "binding": {
+            "$ref": "#/$defs/EditorBinding",
+            "description": "Business object displayed by this canvas item."
+          }
+        },
+        "required": [
+          "id",
+          "projectId",
+          "revision",
+          "kind",
+          "title",
+          "position",
+          "width",
+          "height",
+          "zIndex",
+          "locked",
+          "visible",
+          "parentId",
+          "tags",
+          "binding"
+        ],
+        "title": "LibraryCanvasItem",
+        "type": "object"
+      },
+      "LibraryData": {
+        "additionalProperties": false,
+        "properties": {
+          "collectionId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Selected local library collection, or null when none is selected.",
+            "title": "Collectionid"
+          },
+          "mode": {
+            "default": "dynamic",
+            "description": "Whether the node follows the collection or retains an explicit selection.",
+            "enum": [
+              "dynamic",
+              "fixed"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "itemIds": {
+            "default": [],
+            "description": "Ordered selected media IDs for fixed mode.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 1000,
+            "title": "Itemids",
+            "type": "array"
+          },
+          "activeItemId": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Currently focused media item, independent of the fixed selection.",
+            "title": "Activeitemid"
+          },
+          "activeMediaKind": {
+            "anyOf": [
+              {
+                "enum": [
+                  "image",
+                  "video",
+                  "audio",
+                  "file"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Media kind of the focused item.",
+            "title": "Activemediakind"
+          }
+        },
+        "required": [
+          "collectionId",
+          "mode",
+          "itemIds",
+          "activeItemId",
+          "activeMediaKind"
+        ],
+        "title": "LibraryData",
+        "type": "object"
+      },
+      "LibraryDocument": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Stable identity of this project-owned object.",
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "projectId": {
+            "description": "Owning project ID.",
+            "format": "uuid",
+            "title": "Projectid",
+            "type": "string"
+          },
+          "revision": {
+            "default": 1,
+            "description": "Current object revision for optimistic concurrency.",
+            "minimum": 1,
+            "title": "Revision",
+            "type": "integer"
+          },
+          "schemaVersion": {
+            "const": 1,
+            "default": 1,
+            "description": "Record schema version.",
+            "title": "Schemaversion",
+            "type": "integer"
+          },
+          "inputConnections": {
+            "default": [],
+            "description": "Persisted connections to source assets.",
+            "items": {
+              "$ref": "#/$defs/EditorInputConnection"
+            },
+            "title": "Inputconnections",
+            "type": "array"
+          },
+          "kind": {
+            "const": "library",
+            "description": "Business object or media type.",
+            "title": "Kind",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/$defs/LibraryData",
+            "description": "Typed editable document contents."
+          }
+        },
+        "required": [
+          "id",
+          "projectId",
+          "revision",
+          "schemaVersion",
+          "inputConnections",
+          "kind",
+          "data"
+        ],
+        "title": "LibraryDocument",
+        "type": "object"
+      },
       "MaskStroke": {
         "additionalProperties": false,
         "properties": {
@@ -26720,7 +27301,8 @@
                   "text": "#/$defs/TextCanvasItem",
                   "timeline": "#/$defs/TimelineCanvasItem",
                   "tool": "#/$defs/ToolCanvasItem",
-                  "video": "#/$defs/VideoCanvasItem"
+                  "video": "#/$defs/VideoCanvasItem",
+                  "library": "#/$defs/LibraryCanvasItem"
                 },
                 "propertyName": "kind"
               },
@@ -26756,6 +27338,9 @@
                   "$ref": "#/$defs/DirectorCanvasItem"
                 },
                 {
+                  "$ref": "#/$defs/LibraryCanvasItem"
+                },
+                {
                   "$ref": "#/$defs/GroupCanvasItem"
                 }
               ]
@@ -26776,7 +27361,8 @@
                   "stack": "#/$defs/StackDocument",
                   "subject": "#/$defs/SubjectDocument",
                   "timeline": "#/$defs/TimelineDocument",
-                  "tool": "#/$defs/ToolDocument"
+                  "tool": "#/$defs/ToolDocument",
+                  "library": "#/$defs/LibraryDocument"
                 },
                 "propertyName": "kind"
               },
@@ -26801,6 +27387,9 @@
                 },
                 {
                   "$ref": "#/$defs/DirectorDocument"
+                },
+                {
+                  "$ref": "#/$defs/LibraryDocument"
                 },
                 {
                   "$ref": "#/$defs/MediaEditDocument"
@@ -31728,6 +32317,38 @@
         "title": "VideoParameters",
         "type": "object"
       },
+      "Viewport": {
+        "additionalProperties": false,
+        "properties": {
+          "x": {
+            "default": 0,
+            "description": "Horizontal coordinate.",
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "default": 0,
+            "description": "Vertical coordinate.",
+            "title": "Y",
+            "type": "number"
+          },
+          "zoom": {
+            "default": 1,
+            "description": "Canvas viewport zoom factor.",
+            "maximum": 8,
+            "minimum": 0.08,
+            "title": "Zoom",
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "zoom"
+        ],
+        "title": "Viewport",
+        "type": "object"
+      },
       "ViewState": {
         "additionalProperties": false,
         "properties": {
@@ -31804,38 +32425,6 @@
           "generationCounts"
         ],
         "title": "ViewState",
-        "type": "object"
-      },
-      "Viewport": {
-        "additionalProperties": false,
-        "properties": {
-          "x": {
-            "default": 0,
-            "description": "Horizontal coordinate.",
-            "title": "X",
-            "type": "number"
-          },
-          "y": {
-            "default": 0,
-            "description": "Vertical coordinate.",
-            "title": "Y",
-            "type": "number"
-          },
-          "zoom": {
-            "default": 1,
-            "description": "Canvas viewport zoom factor.",
-            "maximum": 8,
-            "minimum": 0.08,
-            "title": "Zoom",
-            "type": "number"
-          }
-        },
-        "required": [
-          "x",
-          "y",
-          "zoom"
-        ],
-        "title": "Viewport",
         "type": "object"
       },
       "VoiceLibraryCapabilities": {
