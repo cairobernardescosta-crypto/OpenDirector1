@@ -8262,7 +8262,7 @@
           },
           "data": {
             "$ref": "#/$defs/LibraryData",
-            "description": "Typed editable document contents."
+            "description": "Typed local library collection binding."
           }
         },
         "required": [
@@ -24838,7 +24838,7 @@
           },
           "data": {
             "$ref": "#/$defs/LibraryData",
-            "description": "Typed editable document contents."
+            "description": "Typed local library collection binding."
           }
         },
         "required": [
