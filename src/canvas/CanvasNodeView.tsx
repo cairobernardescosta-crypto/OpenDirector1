@@ -38,6 +38,7 @@ const kindNameKeys: Record<CanvasNodeKind, MessageKey> = {
   stack: "canvasNodes.kind.stack",
   tool: "canvasNodes.kind.tool",
   external: "canvasNodes.kind.external",
+  library: "canvasNodes.kind.text",
 };
 
 const toolRoleKeys: Record<string, MessageKey> = {
@@ -51,7 +52,7 @@ function CanvasNodeContents({ id, data, selected }: NodeProps<CanvasFlowNode>) {
   const { t } = useI18n();
   const actions = useContext(CanvasActionsContext);
   const kind = data.kind;
-  const libraryState = kind === "text" ? parseLibraryNode(data.text) : null;
+  const libraryState = kind === "library" ? data.library ?? null : kind === "text" ? parseLibraryNode(data.text) : null;
   const hasAsset = Boolean(data.src) && data.assetState !== "missing";
   const locked = Boolean(actions?.isLocked(id));
   const activity = ["text", "image", "video", "audio"].includes(kind)
@@ -86,7 +87,7 @@ function CanvasNodeContents({ id, data, selected }: NodeProps<CanvasFlowNode>) {
       ) : ["timeline", "stack", "tool", "external"].includes(kind) ? (
         <DomainCard id={id} data={data} actions={actions} />
       ) : libraryState ? (
-        <LocalLibraryNode id={id} state={libraryState} actions={actions} locked={locked} />
+        <LocalLibraryNode id={id} state={libraryState} actions={actions} locked={locked} native={kind === "library"} />
       ) : kind === "text" ? (
         actions?.isTextEditing(id) ? (
           <TextNodeEditor

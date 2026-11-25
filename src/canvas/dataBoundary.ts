@@ -1,4 +1,5 @@
 import { validTimelineText } from "./timelineText.ts";
+import { parseLibraryNodeState } from "./library/libraryNodeState.ts";
 
 import { RULE_FACTS } from "../contracts/ruleFacts.generated.ts";
 import { parseImageCrop } from "./imageCrop.ts";
@@ -602,7 +603,8 @@ export function parseNodeData(
       value.mediaRole !== "generation") ||
     (value.generationProvenance !== undefined &&
       !isGenerationProvenance(value.generationProvenance)) ||
-    (value.settings !== undefined && !isGenerationSettings(value.settings))
+    (value.settings !== undefined && !isGenerationSettings(value.settings)) ||
+    (kind === "library" && !parseLibraryNodeState(value.library))
   )
     return { ok: false, error: tNow("errors.data.node") };
   const result: CanvasNodeData = {
@@ -762,6 +764,7 @@ export function parseNodeData(
         : {}),
     };
   }
+  if (kind === "library") result.library = parseLibraryNodeState(value.library)!;
   if (value.media !== undefined) {
     if (
       !record(value.media) ||

@@ -23,36 +23,31 @@ export function encodeLibraryNode(value: LibraryNodeState): string {
   return LIBRARY_NODE_MARKER + JSON.stringify(value);
 }
 
+export function parseLibraryNodeState(value: unknown): LibraryNodeState | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const state = value as Record<string, unknown>;
+  if (state.version !== 1 || typeof state.collectionId !== "string" ||
+      (state.collectionId !== "" && !uuid.test(state.collectionId)) ||
+      (state.mode !== "fixed" && state.mode !== "dynamic") ||
+      !Array.isArray(state.itemIds) || state.itemIds.length > 1000 ||
+      !state.itemIds.every((id) => typeof id === "string" && uuid.test(id)) ||
+      new Set(state.itemIds).size !== state.itemIds.length ||
+      (state.mode === "dynamic" && state.itemIds.length > 0) ||
+      (state.activeItemId !== undefined &&
+        (typeof state.activeItemId !== "string" || !uuid.test(state.activeItemId))) ||
+      (state.activeMediaKind !== undefined &&
+        !["image", "video", "audio", "file"].includes(String(state.activeMediaKind)))) return null;
+  return {
+    version: 1, collectionId: state.collectionId, mode: state.mode, itemIds: [...state.itemIds],
+    ...(state.activeItemId !== undefined ? { activeItemId: state.activeItemId } : {}),
+    ...(state.activeMediaKind !== undefined ? { activeMediaKind: state.activeMediaKind as LibraryNodeState["activeMediaKind"] } : {}),
+  };
+}
 export function parseLibraryNode(text?: string): LibraryNodeState | null {
   if (!text?.startsWith(LIBRARY_NODE_MARKER)) return null;
-  try {
-    const v: unknown = JSON.parse(text.slice(LIBRARY_NODE_MARKER.length));
-    if (!v || typeof v !== "object" || Array.isArray(v)) return null;
-    const state = v as Record<string, unknown>;
-    if (state.version !== 1 || typeof state.collectionId !== "string" ||
-        (state.collectionId !== "" && !uuid.test(state.collectionId)) ||
-        (state.mode !== "fixed" && state.mode !== "dynamic") ||
-        !Array.isArray(state.itemIds) || state.itemIds.length > 1000 ||
-        !state.itemIds.every((id) => typeof id === "string" && uuid.test(id)) ||
-        new Set(state.itemIds).size !== state.itemIds.length ||
-        (state.activeItemId !== undefined &&
-          (typeof state.activeItemId !== "string" || !uuid.test(state.activeItemId))) ||
-        (state.activeMediaKind !== undefined &&
-          !["image", "video", "audio", "file"].includes(String(state.activeMediaKind)))) return null;
-    return {
-      version: 1,
-      collectionId: state.collectionId,
-      mode: state.mode,
-      itemIds: [...state.itemIds],
-      ...(state.activeItemId !== undefined ? { activeItemId: state.activeItemId } : {}),
-      ...(state.activeMediaKind !== undefined
-        ? { activeMediaKind: state.activeMediaKind as LibraryNodeState["activeMediaKind"] }
-        : {}),
-    };
-  } catch {
-    return null;
-  }
+  try { return parseLibraryNodeState(JSON.parse(text.slice(LIBRARY_NODE_MARKER.length))); } catch { return null; }
 }
+export function isLibraryNodeText(text?: string): boolean { return parseLibraryNode(text) !== null; }
 
 /** The native creation menu offers the selected file's kind only.
  * Without a selected item it presents the media types, then asks the user to

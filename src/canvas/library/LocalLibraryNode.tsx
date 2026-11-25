@@ -17,11 +17,13 @@ export function LocalLibraryNode({
   state,
   actions,
   locked,
+  native = false,
 }: {
   id: string;
   state: LibraryNodeState;
   actions: CanvasActions | null;
   locked: boolean;
+  native?: boolean;
 }) {
   const t = useT();
   const [collections, setCollections] = useState<LibraryCollection[]>([]);
@@ -95,7 +97,7 @@ export function LocalLibraryNode({
     if (locked || !actions) return;
     const next = { ...latestState.current, ...patch };
     latestState.current = next;
-    actions.update(id, { text: encodeLibraryNode(next) });
+    actions.update(id, native ? { library: next } : { text: encodeLibraryNode(next) });
   };
   const current = collections.find((item) => item.id === state.collectionId);
   const matching = resolved?.items.filter((item) =>

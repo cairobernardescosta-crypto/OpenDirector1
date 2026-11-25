@@ -1,6 +1,7 @@
 import type { AssetRef, TimelineTextOverlay } from "../contracts/generated.ts";
 
 import type { VoiceSelection } from "../backend/voices.ts";
+import type { LibraryNodeState } from "./library/libraryNodeState.ts";
 import type { ImageParameters } from "../contracts/generated.ts";
 import { indexNodes, ancestors, isNodeLocked } from "./hierarchy.ts";
 import { mapCanvasToolTaskReferences } from "./toolCatalog.ts";
@@ -33,6 +34,7 @@ export type CanvasNodeKind =
   | "audio"
   | "file"
   | "text"
+  | "library"
   | "group"
   | "timeline"
   | "subject"
@@ -211,6 +213,7 @@ export interface CanvasNodeData extends Record<string, unknown> {
   src?: string;
   mimeType?: string;
   text?: string;
+  library?: LibraryNodeState;
   assetState?: "ready" | "missing";
   /** Imported/derived assets have editing controls, not an automatic generator.
    * Omitted in older documents; keep their existing generator behavior. */
@@ -399,6 +402,7 @@ export function createNode(
     audio: [AUDIO_CARD_SIZE.width, AUDIO_CARD_SIZE.height],
     file: [260, 110],
     text: [300, 300],
+    library: [360, 420],
     group: [640, 480],
     timeline: [600, 280],
     subject: [320, SUBJECT_BASE_HEIGHT],
@@ -412,6 +416,7 @@ export function createNode(
     audio: "canvasNodes.kind.audio",
     file: "canvasNodes.kind.file",
     text: "canvasNodes.kind.text",
+    library: "canvasNodes.kind.text",
     group: "canvasNodes.kind.group",
     timeline: "canvasNodes.kind.timeline",
     subject: "canvasNodes.kind.subject",
