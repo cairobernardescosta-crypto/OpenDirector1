@@ -630,10 +630,30 @@ class DirectorDocument(EditorDocumentBase):
     data: DirectorData = Field(description='Typed editable document contents.')
 
 
+class LibraryData(Contract):
+    collectionId: UUID | None = Field(default=None, description='Selected local library collection, or null when none is selected.')
+    mode: Literal['dynamic', 'fixed'] = Field(default='dynamic', description='Whether the node follows the collection or retains an explicit selection.')
+    itemIds: tuple[UUID, ...] = Field(default=(), max_length=1000, description='Ordered selected media IDs for fixed mode.')
+    activeItemId: UUID | None = Field(default=None, description='Currently focused media item, independent of the fixed selection.')
+    activeMediaKind: Literal['image', 'video', 'audio', 'file'] | None = Field(default=None, description='Media kind of the focused item.')
+
+    @model_validator(mode='after')
+    def selection(self):
+        unique(self.itemIds, 'library item IDs')
+        if self.mode == 'dynamic' and self.itemIds:
+            raise ValueError('Dynamic library nodes cannot persist a fixed item selection')
+        return self
+
+
+class LibraryDocument(EditorDocumentBase):
+    kind: Literal['library'] = Field(description='Business object or media type.')
+    data: LibraryData = Field(description='Typed local library collection binding.')
+
+
 class MediaEditDocument(EditorDocumentBase):
     kind: Literal['media_edit'] = Field(description='Business object or media type.')
     data: MediaEditData = Field(description='Typed editable document contents.')
 
 
 EditorDocument = Annotated[TimelineDocument | SubjectDocument | LayerDocument | ImageCropDocument | StackDocument |
-    ToolDocument | DirectorDocument | MediaEditDocument, Field(discriminator='kind')]
+    ToolDocument | DirectorDocument | LibraryDocument | MediaEditDocument, Field(discriminator='kind')]

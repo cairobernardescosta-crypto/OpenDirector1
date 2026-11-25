@@ -293,6 +293,8 @@ export class CreationProjection {
 
   async editorData(doc: EditorDocument): Promise<Partial<CanvasNode["data"]>> {
     switch (doc.kind) {
+      case "library":
+        return { library: { ...doc.data, itemIds: [...doc.data.itemIds] } };
       case "subject":
         return {
           subject: {
@@ -1084,6 +1086,18 @@ export class CreationProjection {
     };
     const ref = (resource: CanvasResource) => this.importResource(resource);
     switch (kind) {
+      case "library":
+        return {
+          ...common,
+          kind,
+          data: {
+            collectionId: node.data.library?.collectionId ?? null,
+            mode: node.data.library?.mode ?? "dynamic",
+            itemIds: [...(node.data.library?.itemIds ?? [])],
+            activeItemId: node.data.library?.activeItemId ?? null,
+            activeMediaKind: node.data.library?.activeMediaKind ?? null,
+          },
+        };
       case "media_edit": {
         const task = node.data.taskDraft!;
         const sources = task.sourceNodeIds.map((id) => {

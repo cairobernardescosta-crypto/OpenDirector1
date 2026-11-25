@@ -28,7 +28,7 @@ class CanvasReferenceSources(Contract):
     pinned: PinnedReferenceSource = Field(description='Source fields for a pinned reference retaining its canvas connection.')
 
 
-CanvasKind = Literal['text', 'image', 'video', 'audio', 'file', 'group', 'timeline', 'subject', 'stack', 'tool', 'external']
+CanvasKind = Literal['text', 'image', 'video', 'audio', 'file', 'library', 'group', 'timeline', 'subject', 'stack', 'tool', 'external']
 MediaRole = Literal['empty', 'material', 'generation']
 
 AUDIO_CARD_SIZE = (300, 112)
@@ -60,7 +60,7 @@ class GenerationSpecRef(Contract):
 class EditorRef(Contract):
     objectType: Literal['editor_document'] = Field(default='editor_document', description='Referenced business object type.')
     id: UUID = Field(description='Referenced editable document ID.')
-    kind: Literal['timeline', 'subject', 'stack', 'tool', 'director', 'layers', 'image_crop', 'media_edit'] = Field(description='Business object or media type.')
+    kind: Literal['timeline', 'subject', 'stack', 'tool', 'director', 'library', 'layers', 'image_crop', 'media_edit'] = Field(description='Business object or media type.')
 
 
 class EmptyBinding(Contract):
@@ -189,13 +189,17 @@ class DirectorCanvasItem(EditorCanvasItem):
     kind: Literal['external'] = Field(description='Business object or media type.')
 
 
+class LibraryCanvasItem(EditorCanvasItem):
+    kind: Literal['library'] = Field(description='Business object or media type.')
+
+
 class GroupCanvasItem(CanvasItemBase):
     kind: Literal['group'] = Field(description='Business object or media type.')
     binding: ContainerBinding = Field(default_factory=lambda: ContainerBinding(role='container'), description='Business object displayed by this canvas item.')
 
 
 CanvasItem = Annotated[TextCanvasItem | ImageCanvasItem | VideoCanvasItem | AudioCanvasItem | FileCanvasItem |
-    SubjectCanvasItem | TimelineCanvasItem | StackCanvasItem | ToolCanvasItem | DirectorCanvasItem | GroupCanvasItem,
+    SubjectCanvasItem | TimelineCanvasItem | StackCanvasItem | ToolCanvasItem | DirectorCanvasItem | LibraryCanvasItem | GroupCanvasItem,
     Field(discriminator='kind')]
 
 RoleAction = Literal['configure_generation', 'save_manual_text', 'upload_material', 'add_reference', 'accept_generation', 'select_result']
