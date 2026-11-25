@@ -153,3 +153,22 @@ test("library node without a selected collection is not offered as an Agent ment
   });
   assert.deepEqual(referenceCandidates([source], []), []);
 });
+
+
+test("native library nodes keep their own type and are offered to the Agent as one mention", () => {
+  const source = createNode("library", undefined, {
+    title: "Campanha de novembro",
+    library: { ...initial, mode: "dynamic", itemIds: [] },
+  });
+  assert.equal(source.type, "library");
+  assert.equal(canStartReference(source), true);
+  assert.equal(canSourceReference(source), false);
+  assert.equal(referenceMaterial(source), null);
+  assert.deepEqual(assistantReferences([source]), []);
+  const [pending] = pendingCanvasReferences([source]);
+  assert.ok(pending?.error);
+  assert.deepEqual(pending?.identity.references, []);
+  const options = referenceCandidates([source], []);
+  assert.equal(options.length, 1);
+  assert.equal(options[0]?.id, `node:${source.id}`);
+});
