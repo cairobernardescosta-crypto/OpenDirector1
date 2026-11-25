@@ -32,6 +32,31 @@ test("library card state survives native canvas serialization and undo", () => {
   assert.deepEqual(parseLibraryNode(node.data.text), initial);
 });
 
+
+test("rapid library changes merge against the latest selection and survive reopen", () => {
+  const first = { ...initial, activeItemId: imageId, activeMediaKind: "image" as const };
+  const secondId = "33333333-3333-4333-8333-333333333333";
+  const afterSecondSelection = {
+    ...first,
+    itemIds: [...first.itemIds, secondId],
+  };
+  const finalState = {
+    ...afterSecondSelection,
+    mode: "dynamic" as const,
+  };
+  const node = createNode("text", { x: 10, y: 20 }, {
+    title: "Biblioteca local",
+    text: encodeLibraryNode(finalState),
+  });
+  const saved = serializeDocument({ ...createDocument(), nodes: [node] });
+  assert.equal(saved.ok, true);
+  if (!saved.ok) return;
+  const reopened = parseDocument(saved.value);
+  assert.equal(reopened.ok, true);
+  if (!reopened.ok) return;
+  assert.deepEqual(parseLibraryNode(reopened.value.nodes[0]?.data.text), finalState);
+});
+
 test("library card is not a media source or generation prompt", () => {
   const source = createNode("text", undefined, { text: encodeLibraryNode(initial) });
   const target = createNode("image");
