@@ -294,7 +294,14 @@ export class CreationProjection {
   async editorData(doc: EditorDocument): Promise<Partial<CanvasNode["data"]>> {
     switch (doc.kind) {
       case "library":
-        return { library: { ...doc.data, itemIds: [...doc.data.itemIds] } };
+        return { library: {
+          version: 1,
+          collectionId: doc.data.collectionId ?? "",
+          mode: doc.data.mode,
+          itemIds: [...doc.data.itemIds],
+          ...(doc.data.activeItemId ? { activeItemId: doc.data.activeItemId } : {}),
+          ...(doc.data.activeMediaKind ? { activeMediaKind: doc.data.activeMediaKind } : {}),
+        } };
       case "subject":
         return {
           subject: {

@@ -26,7 +26,7 @@ export function pendingCanvasReferences(
   return [...new Map(nodes.map((node) => [node.id, node])).values()].map(
     (node) => {
       const data = node.data;
-      const supported = !isLibraryNodeText(data.text) &&
+      const supported = node.type !== "library" && !isLibraryNodeText(data.text) &&
         ["text", "image", "video", "audio", "subject"].includes(node.type);
       const available =
         node.type === "text"

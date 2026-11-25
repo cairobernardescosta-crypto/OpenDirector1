@@ -11,7 +11,7 @@ export function assistantReferences(
   for (const node of nodes) {
     const data = node.data;
     // Local-library manifests are configuration, not prompt or media text.
-    if (node.type === "text" && isLibraryNodeText(data.text)) continue;
+    if (node.type === "library" || (node.type === "text" && isLibraryNodeText(data.text))) continue;
     if (node.type === "text") {
       if (data.text?.trim())
         references.push({

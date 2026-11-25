@@ -19,7 +19,7 @@ export function referenceCandidates(
   issue: (node: CanvasNode) => string | null = () => null,
 ): MentionOption[] {
   const libraryNodes = nodes.filter(
-    (node) => node.type === "text" && parseLibraryNode(node.data.text),
+    (node) => node.type === "library" || (node.type === "text" && parseLibraryNode(node.data.text)),
   );
   const regularNodes = nodes.filter((node) => !libraryNodes.includes(node));
   const options = nodeMentionOptions(
@@ -30,7 +30,7 @@ export function referenceCandidates(
     (option) => ({ ...option, id: `node:${option.id}` }),
   );
   for (const node of libraryNodes) {
-    const state = parseLibraryNode(node.data.text);
+    const state = node.type === "library" ? node.data.library : parseLibraryNode(node.data.text);
     if (!state?.collectionId) continue;
     options.push({
       id: `node:${node.id}`,

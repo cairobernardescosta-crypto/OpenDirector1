@@ -35,6 +35,7 @@ import {
 import {
   libraryResolutionSelection,
   parseLibraryNode,
+  parseLibraryNodeState,
 } from "./library/libraryNodeState.ts";
 import { createLibraryReferenceBatch } from "./library/libraryReferenceContract.ts";
 import { isGenerationModel } from "../backend/rules";
@@ -423,8 +424,9 @@ export function useAssistantChat(
     add(
       async (signal) => {
         const libraryNodes = nodes.flatMap((node) => {
-          if (node.type !== "text") return [];
-          const state = parseLibraryNode(node.data.text);
+          const state = node.type === "library"
+            ? parseLibraryNodeState(node.data.library)
+            : node.type === "text" ? parseLibraryNode(node.data.text) : null;
           return state ? [{ node, state }] : [];
         });
         const canvasNodes = nodes.filter(

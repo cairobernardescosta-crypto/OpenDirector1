@@ -9,6 +9,7 @@ export const CANVAS_CREATION_TOOLS: readonly {
   unavailable?: boolean;
 }[] = [
   { kind: "text", labelKey: "canvas.kind.text", icon: "text" },
+  { kind: "library", labelKey: "library.node.title", icon: "rail-folder" },
   { kind: "image", labelKey: "canvas.kind.image", icon: "image" },
   { kind: "video", labelKey: "canvas.kind.video", icon: "video" },
   { kind: "audio", labelKey: "canvas.kind.audio", icon: "audio" },

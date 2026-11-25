@@ -442,6 +442,9 @@ export function createNode(
       ...(["image", "video", "audio"].includes(kind) && !data.src
         ? { mediaRole: "generation" as const }
         : {}),
+      ...(kind === "library"
+        ? { library: { version: 1, collectionId: "", mode: "dynamic", itemIds: [] } }
+        : {}),
       ...(kind === "timeline"
         ? {
             timeline: {
