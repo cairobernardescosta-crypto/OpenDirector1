@@ -100,6 +100,24 @@ test("same-named selected nodes retain separate identities; title and material c
   );
 });
 
+test("changing the underlying asset ID invalidates a staged media reference", () => {
+  const image = createNode("image", undefined, {
+    title: "Same preview",
+    backendAssetId: "asset-old",
+  });
+  const changed = {
+    ...image,
+    data: { ...image.data, backendAssetId: "asset-new" },
+  };
+  assert.equal(
+    samePendingReferences(
+      pendingCanvasReferences([image]),
+      pendingCanvasReferences([changed]),
+    ),
+    false,
+  );
+});
+
 test("project-owned media can be staged by asset ID even when no preview URL is present", () => {
   const image = createNode("image", undefined, {
     title: "Asset without preview",

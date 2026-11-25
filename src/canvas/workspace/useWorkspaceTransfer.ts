@@ -159,6 +159,11 @@ export function useWorkspaceTransfer(rt: WorkspaceRuntime) {
 
   const insertLibraryItems = async (items: LibraryItem[], targetNodeId?: string, worldPosition?: Point) => {
     const client = creationClient(doc.id);
+    if (items.some((item) =>
+      item.origin.type === "canvas" &&
+      item.origin.projectId === doc.id &&
+      item.origin.assetId
+    )) await client.refresh();
     let placed = 0;
     const issues: string[] = [];
     for (const item of items) {
