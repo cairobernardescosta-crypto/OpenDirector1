@@ -74,3 +74,27 @@ export function libraryResolutionSelection(
 export function isLibraryNodeText(text?: string): boolean {
   return parseLibraryNode(text) !== null;
 }
+
+
+/** Switches selection mode without allowing stale IDs to leak into dynamic mode. */
+export function setLibraryNodeMode(
+  state: LibraryNodeState,
+  mode: LibraryNodeState["mode"],
+  availableItemIds: readonly string[] = [],
+): LibraryNodeState {
+  if (mode === "dynamic") return { ...state, mode, itemIds: [] };
+  const source = state.mode === "fixed" ? state.itemIds : availableItemIds;
+  return { ...state, mode, itemIds: [...new Set(source)].slice(0, 1000) };
+}
+
+/** Adds/removes one item while preserving the user's selection order. */
+export function toggleLibraryNodeItem(
+  state: LibraryNodeState,
+  itemId: string,
+): LibraryNodeState {
+  if (!uuid.test(itemId)) return state;
+  const selected = new Set(state.itemIds);
+  if (selected.has(itemId)) selected.delete(itemId);
+  else if (selected.size < 1000) selected.add(itemId);
+  return { ...state, itemIds: [...selected] };
+}

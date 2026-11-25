@@ -2,7 +2,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { LibraryCollectionResolution, LibraryItem } from "../src/canvas/library/libraryClient.ts";
 import { createLibraryReferenceBatch } from "../src/canvas/library/libraryReferenceContract.ts";
-import type { LibraryNodeState } from "../src/canvas/library/libraryNodeState.ts";
+import {
+  setLibraryNodeMode,
+  toggleLibraryNodeItem,
+  type LibraryNodeState,
+} from "../src/canvas/library/libraryNodeState.ts";
 
 const collectionId = "11111111-1111-4111-8111-111111111111";
 const imageId = "22222222-2222-4222-8222-222222222222";
@@ -134,4 +138,24 @@ test("requires a stable source node ID", () => {
     () => createLibraryReferenceBatch("", state("dynamic"), resolution([], [])),
     /source node ID/,
   );
+});
+
+
+test("switching modes clears stale fixed IDs and snapshots dynamic collection IDs", () => {
+  assert.deepEqual(
+    setLibraryNodeMode(state("dynamic"), "fixed", [videoId, imageId]).itemIds,
+    [videoId, imageId],
+  );
+  assert.deepEqual(
+    setLibraryNodeMode(state("fixed", [imageId]), "dynamic").itemIds,
+    [],
+  );
+});
+
+test("fixed selection toggles IDs without duplicates and preserves selection order", () => {
+  const first = toggleLibraryNodeItem(state("fixed"), videoId);
+  const second = toggleLibraryNodeItem(first, imageId);
+  assert.deepEqual(second.itemIds, [videoId, imageId]);
+  assert.deepEqual(toggleLibraryNodeItem(second, videoId).itemIds, [imageId]);
+  assert.deepEqual(toggleLibraryNodeItem(second, "not-an-id").itemIds, [videoId, imageId]);
 });
