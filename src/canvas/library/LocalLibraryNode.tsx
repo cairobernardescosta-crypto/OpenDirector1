@@ -24,6 +24,9 @@ export function LocalLibraryNode({
 }) {
   const t = useT();
   const [collections, setCollections] = useState<LibraryCollection[]>([]);
+  const [collectionsBusy, setCollectionsBusy] = useState(true);
+  const [collectionsError, setCollectionsError] = useState("");
+  const [collectionsRefresh, setCollectionsRefresh] = useState(0);
   const [resolved, setResolved] = useState<LibraryCollectionResolution | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -35,11 +38,22 @@ export function LocalLibraryNode({
 
   useEffect(() => {
     let active = true;
+    setCollectionsBusy(true);
+    setCollectionsError("");
     listCollections({ fresh: true })
-      .then((rows) => { if (active) setCollections(rows); })
-      .catch((reason) => { if (active) setError(errorMessage(reason)); });
+      .then((rows) => {
+        if (!active) return;
+        if (!Array.isArray(rows)) throw new Error("A biblioteca retornou uma lista de coleções inválida.");
+        setCollections(rows);
+      })
+      .catch((reason) => {
+        if (active) setCollectionsError(errorMessage(reason));
+      })
+      .finally(() => {
+        if (active) setCollectionsBusy(false);
+      });
     return () => { active = false; };
-  }, []);
+  }, [collectionsRefresh]);
 
   useEffect(() => {
     let active = true;
@@ -71,7 +85,7 @@ export function LocalLibraryNode({
     <div className="cw-local-library nowheel" onDoubleClick={(event) => event.stopPropagation()}>
       <label className="cw-local-library-line">
         <span>{t("library.node.collection")}</span>
-        <select className="nodrag nopan nowheel" value={state.collectionId} disabled={locked || busy}
+        <select className="nodrag nopan nowheel" value={state.collectionId} disabled={locked || busy || collectionsBusy}
           onPointerDown={(event) => event.stopPropagation()}
           onChange={(event) => change({ collectionId: event.target.value, itemIds: [], activeItemId: undefined, activeMediaKind: undefined })}>
           <option value="">{t("library.node.choose")}</option>
@@ -80,6 +94,20 @@ export function LocalLibraryNode({
             <option value={state.collectionId}>{t("library.node.unavailable")}</option>}
         </select>
       </label>
+      {collectionsBusy && <p className="cw-local-library-hint">{t("library.assets.loading")}</p>}
+      {collectionsError && (
+        <div>
+          <p className="cw-local-library-error" role="alert">{collectionsError}</p>
+          <button type="button" className="nodrag nopan nowheel"
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={() => setCollectionsRefresh((value) => value + 1)}>
+            {t("library.node.refresh")}
+          </button>
+        </div>
+      )}
+      {!collectionsBusy && !collectionsError && collections.length === 0 && (
+        <p className="cw-local-library-hint">{t("library.node.chooseHint")}</p>
+      )}
       <label className="cw-local-library-line">
         <span>{t("library.node.mode")}</span>
         <select className="nodrag nopan nowheel" value={state.mode} disabled={locked || !state.collectionId}
