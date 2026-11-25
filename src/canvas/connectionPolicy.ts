@@ -42,7 +42,7 @@ export function nodeDownstreamKinds(
 
 export function referenceMaterial(node: CanvasNode): string | null {
   // A serialized library manifest is not an instruction or media input.
-  if (node.type === "text" && isLibraryNodeText(node.data.text)) return null;
+  if (node.type === "library" || (node.type === "text" && isLibraryNodeText(node.data.text))) return null;
   if (node.data.assetState === "missing") return null;
   if (node.type === "text")
     return node.data.text?.trim() ? node.data.text : null;
@@ -71,7 +71,7 @@ export function canStartReference(node: CanvasNode): boolean {
   // Library cards may start a creation gesture, but never supply their
   // serialized manifest as a generator reference edge. The menu imports the
   // selected file as a separate native project-owned media node instead.
-  if (node.type === "text" && isLibraryNodeText(node.data.text)) return true;
+  if (node.type === "library" || (node.type === "text" && isLibraryNodeText(node.data.text))) return true;
   return (
     Boolean(nodeDownstreamKinds(node).length) &&
     (node.data.mediaRole !== "asset" || Boolean(referenceMaterial(node)))
@@ -81,7 +81,7 @@ export function canStartReference(node: CanvasNode): boolean {
 export function canSourceReference(node: CanvasNode): boolean {
   // The library card's port starts a UI creation/import gesture only.
   // Its persisted text is a manifest, never usable as source material.
-  if (node.type === "text" && isLibraryNodeText(node.data.text))
+  if (node.type === "library" || (node.type === "text" && isLibraryNodeText(node.data.text)))
     return false;
   if (!canStartReference(node) || node.data.assetState === "missing")
     return false;
