@@ -94,7 +94,14 @@ export function toggleLibraryNodeItem(
 ): LibraryNodeState {
   if (!uuid.test(itemId)) return state;
   const selected = new Set(state.itemIds);
-  if (selected.has(itemId)) selected.delete(itemId);
+  const removing = selected.has(itemId);
+  if (removing) selected.delete(itemId);
   else if (selected.size < 1000) selected.add(itemId);
-  return { ...state, itemIds: [...selected] };
+  return {
+    ...state,
+    itemIds: [...selected],
+    ...(removing && state.activeItemId === itemId
+      ? { activeItemId: undefined, activeMediaKind: undefined }
+      : {}),
+  };
 }

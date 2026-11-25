@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CanvasActions } from "../CanvasActionsContext";
 import { CanvasIcon } from "../CanvasIcon";
 import { useT } from "../../i18n/I18nProvider";
 import { errorMessage } from "../../backend/api";
 import { listCollections, resolveCollection, type LibraryCollection, type LibraryCollectionResolution, type LibraryMediaKind, type LibraryItem } from "./libraryClient";
-import { encodeLibraryNode, libraryResolutionSelection, setLibraryNodeMode, toggleLibraryNodeItem, type LibraryNodeState } from "./libraryNodeState";
-import { createLibraryReferenceBatch } from "./libraryReferenceContract";
+import { encodeLibraryNode, libraryResolutionSelection, type LibraryNodeState } from "./libraryNodeState";
 import { MediaCard } from "./MediaCard";
 import { LocalLibraryPreview } from "./LocalLibraryPreview";
 import "./local-library-node.css";
@@ -62,14 +61,6 @@ export function LocalLibraryNode({
   }, [collectionsRefresh]);
 
   const fixedItemIdsKey = state.mode === "fixed" ? state.itemIds.join(",") : "";
-  const batchResult = useMemo(() => {
-    if (!resolved) return { batch: null, error: "" };
-    try {
-      return { batch: createLibraryReferenceBatch(id, state, resolved), error: "" };
-    } catch (reason) {
-      return { batch: null, error: errorMessage(reason) };
-    }
-  }, [id, state, resolved]);
 
   useEffect(() => {
     let active = true;
@@ -130,17 +121,15 @@ export function LocalLibraryNode({
         <span>{t("library.node.mode")}</span>
         <select className="nodrag nopan nowheel" value={state.mode} disabled={locked || !state.collectionId}
           onPointerDown={(event) => event.stopPropagation()}
-          onChange={(event) => change(setLibraryNodeMode(
-            state,
-            event.target.value === "fixed" ? "fixed" : "dynamic",
-            resolved?.items.map((item) => item.id) ?? [],
-          ))}>
+          onChange={(event) => change({
+            mode: event.target.value === "fixed" ? "fixed" : "dynamic",
+            itemIds: event.target.value === "fixed" ? resolved?.items.slice(0, 1000).map((item) => item.id) ?? state.itemIds : [],
+          })}>
           <option value="dynamic">{t("library.node.dynamic")}</option>
           <option value="fixed">{t("library.node.fixed")}</option>
         </select>
       </label>
       {error && <p className="cw-local-library-error" role="alert">{error}</p>}
-      {batchResult.error && <p className="cw-local-library-error" role="alert">{batchResult.error}</p>}
       {!state.collectionId && <p className="cw-local-library-hint">{t("library.node.chooseHint")}</p>}
       {busy && <p className="cw-local-library-hint">{t("library.assets.loading")}</p>}
       {resolved && (
@@ -167,7 +156,7 @@ export function LocalLibraryNode({
             </button>
           </div>
           <div className="cw-local-library-meta">
-            <span>{batchResult.batch?.references.length ?? 0} {t("library.node.files")}</span>
+            <span>{resolved.items.length} {t("library.node.files")}</span>
             {resolved.unavailableIds.length > 0 && (
               <span className="cw-local-library-error">
                 {resolved.unavailableIds.length} {t("library.node.missing")}
@@ -214,7 +203,11 @@ export function LocalLibraryNode({
                     )}
                   </>
                 ) : undefined}
-                onSelect={() => change(toggleLibraryNodeItem(state, item.id))}
+                onSelect={() => change({
+                  itemIds: state.itemIds.includes(item.id)
+                    ? state.itemIds.filter((id) => id !== item.id)
+                    : [...state.itemIds, item.id].slice(0, 1000),
+                })}
               />
               </div>
             ))}

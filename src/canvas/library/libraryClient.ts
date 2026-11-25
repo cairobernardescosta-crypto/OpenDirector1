@@ -403,82 +403,18 @@ export type LibraryCollectionResolution = {
   unavailableIds: string[];
 };
 
-function normalizeCollectionResolution(
-  value: LibraryCollectionResolution,
-  requestedCollectionId: string,
-  fixedItemIds?: readonly string[],
-): LibraryCollectionResolution {
-  if (!value || typeof value !== "object" ||
-      value.collectionId !== requestedCollectionId ||
-      typeof value.collectionName !== "string" ||
-      !Array.isArray(value.itemIds) || !Array.isArray(value.items) ||
-      !Array.isArray(value.unavailableIds))
-    throw new Error("A biblioteca retornou uma resolução de coleção inválida.");
-
-  const resolvedIds = value.itemIds;
-  if (!resolvedIds.every((itemId) => typeof itemId === "string") ||
-      new Set(resolvedIds).size !== resolvedIds.length)
-    throw new Error("A resolução da biblioteca contém IDs inválidos ou duplicados.");
-
-  const itemIds = fixedItemIds === undefined ? [...resolvedIds] : [...fixedItemIds];
-  if (fixedItemIds !== undefined &&
-      (new Set(fixedItemIds).size !== fixedItemIds.length ||
-       fixedItemIds.some((itemId) => !resolvedIds.includes(itemId)) ||
-       resolvedIds.some((itemId) => !fixedItemIds.includes(itemId))))
-    throw new Error("A biblioteca não resolveu exatamente os itens selecionados.");
-
-  const allowed = new Set(itemIds);
-  const itemsById = new Map<string, LibraryItem>();
-  for (const item of value.items) {
-    if (!item || typeof item.id !== "string" || !allowed.has(item.id) ||
-        itemsById.has(item.id))
-      throw new Error("A resolução da biblioteca contém arquivos inesperados ou duplicados.");
-    itemsById.set(item.id, item);
-  }
-
-  const unavailable = new Set<string>();
-  for (const itemId of value.unavailableIds) {
-    if (typeof itemId !== "string" || !allowed.has(itemId))
-      throw new Error("A resolução da biblioteca contém IDs indisponíveis inválidos.");
-    unavailable.add(itemId);
-  }
-  for (const itemId of itemIds) {
-    if (!itemsById.has(itemId)) unavailable.add(itemId);
-  }
-
-  return {
-    collectionId: value.collectionId,
-    collectionName: value.collectionName,
-    itemIds,
-    items: itemIds.flatMap((itemId) => {
-      const item = itemsById.get(itemId);
-      return item ? [item] : [];
-    }),
-    unavailableIds: itemIds.filter((itemId) => unavailable.has(itemId)),
-  };
-}
-
-/** Resolves one collection as a stable, ordered batch of selected assets. */
 export async function resolveCollection(
   id: string,
   fixedItemIds?: readonly string[],
 ): Promise<LibraryCollectionResolution> {
-  if (!id) throw new Error("Selecione uma coleção antes de resolver a biblioteca.");
-  if (fixedItemIds !== undefined &&
-      (fixedItemIds.length > 1000 ||
-       fixedItemIds.some((itemId) => typeof itemId !== "string") ||
-       new Set(fixedItemIds).size !== fixedItemIds.length))
-    throw new Error("A seleção fixa da biblioteca é inválida.");
-
   const path = `/library/collections/${encodeURIComponent(id)}/resolve`;
-  const value = fixedItemIds === undefined
-    ? await request<LibraryCollectionResolution>(path)
-    : await request<LibraryCollectionResolution>(path, {
+  return fixedItemIds === undefined
+    ? request<LibraryCollectionResolution>(path)
+    : request<LibraryCollectionResolution>(path, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ itemIds: [...fixedItemIds] }),
       });
-  return normalizeCollectionResolution(value, id, fixedItemIds);
 }
 
 export async function createCollection(name: string): Promise<LibraryCollection> {

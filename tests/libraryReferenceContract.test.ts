@@ -156,6 +156,13 @@ test("fixed selection toggles IDs without duplicates and preserves selection ord
   const first = toggleLibraryNodeItem(state("fixed"), videoId);
   const second = toggleLibraryNodeItem(first, imageId);
   assert.deepEqual(second.itemIds, [videoId, imageId]);
-  assert.deepEqual(toggleLibraryNodeItem(second, videoId).itemIds, [imageId]);
+  const removed = toggleLibraryNodeItem(second, videoId);
+  assert.deepEqual(removed.itemIds, [imageId]);
+  const active = toggleLibraryNodeItem(
+    { ...second, activeItemId: videoId, activeMediaKind: "video" },
+    videoId,
+  );
+  assert.equal(active.activeItemId, undefined);
+  assert.equal(active.activeMediaKind, undefined);
   assert.deepEqual(toggleLibraryNodeItem(second, "not-an-id").itemIds, [videoId, imageId]);
 });
