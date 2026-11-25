@@ -502,7 +502,8 @@ def agent_routes(projects, generation, configs, provider=None, *, active=None) -
                                     'metadata': asset.metadata.model_dump(mode='json', exclude_none=True)})
                         if references:
                             content += '\nReferenced project assets: ' + json.dumps(references, ensure_ascii=False)
-                            content += '\nThese are asset references, not visual observations. Inspect media with available tools before describing its contents.'
+                            content += ('\nThese are asset references, not visual observations. Inspect the actual file contents with available tools before describing them; never infer visual or audio content from filenames or metadata alone.'
+                                '\nFor images, use an image-capable inspection tool when available. For video, inspect streams and duration with ffprobe and sample representative frames with ffmpeg when available. For audio, use available audio-inspection tools. If the selected runtime cannot inspect a format, state that limitation instead of guessing.')
                         context.append({'role': message['role'], 'content': content})
                     if preferences:
                         context[-1]['content'] += '\nUser model preferences for this turn: ' + json.dumps(preferences, ensure_ascii=False)

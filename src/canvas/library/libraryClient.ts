@@ -93,7 +93,7 @@ export function itemContentUrl(item: LibraryItem): string {
  * Fetches library bytes with the required headers and exposes a blob: URL,
  * mirroring how canvas nodes load media (CreationClient.mediaUrl).
  */
-/** Reads an item's bytes; used when copying library media into a canvas. */
+/** Reads an item's bytes for a confirmed consumer transfer, without creating a Canvas node. */
 export async function itemBlob(
   item: LibraryItem,
   signal?: AbortSignal,
