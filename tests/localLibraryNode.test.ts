@@ -6,7 +6,7 @@ import { canStartReference, canSourceReference, referenceMaterial, referenceIssu
 import { referencePortDirection } from "../src/canvas/connectionPorts.ts";
 import { assistantReferences } from "../src/canvas/assistantReferences.ts";
 import { pendingCanvasReferences } from "../src/canvas/pendingCanvasReferences.ts";
-import { encodeLibraryNode, isLibraryNodeText, parseLibraryNode, libraryCreationKinds } from "../src/canvas/library/libraryNodeState.ts";
+import { encodeLibraryNode, isLibraryNodeText, parseLibraryNode, libraryCreationKinds, libraryResolutionSelection } from "../src/canvas/library/libraryNodeState.ts";
 
 const collectionId = "11111111-1111-4111-8111-111111111111";
 const imageId = "22222222-2222-4222-8222-222222222222";
@@ -55,6 +55,16 @@ test("rapid library changes merge against the latest selection and survive reope
   assert.equal(reopened.ok, true);
   if (!reopened.ok) return;
   assert.deepEqual(parseLibraryNode(reopened.value.nodes[0]?.data.text), finalState);
+});
+
+test("dynamic mode resolves the live collection and fixed mode resolves only saved IDs", () => {
+  const dynamic = { ...initial, mode: "dynamic" as const, itemIds: [] };
+  const fixed = { ...initial, mode: "fixed" as const, itemIds: [imageId] };
+  const emptyFixed = { ...initial, mode: "fixed" as const, itemIds: [] };
+
+  assert.equal(libraryResolutionSelection(dynamic), undefined);
+  assert.deepEqual(libraryResolutionSelection(fixed), [imageId]);
+  assert.deepEqual(libraryResolutionSelection(emptyFixed), []);
 });
 
 test("library card is not a media source or generation prompt", () => {
