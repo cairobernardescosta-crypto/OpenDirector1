@@ -1961,13 +1961,13 @@
                 "file": "#/$defs/FileCanvasItem",
                 "group": "#/$defs/GroupCanvasItem",
                 "image": "#/$defs/ImageCanvasItem",
+                "library": "#/$defs/LibraryCanvasItem",
                 "stack": "#/$defs/StackCanvasItem",
                 "subject": "#/$defs/SubjectCanvasItem",
                 "text": "#/$defs/TextCanvasItem",
                 "timeline": "#/$defs/TimelineCanvasItem",
                 "tool": "#/$defs/ToolCanvasItem",
-                "video": "#/$defs/VideoCanvasItem",
-                "library": "#/$defs/LibraryCanvasItem"
+                "video": "#/$defs/VideoCanvasItem"
               },
               "propertyName": "kind"
             },
@@ -3076,13 +3076,13 @@
                 "file": "#/$defs/FileCanvasItem",
                 "group": "#/$defs/GroupCanvasItem",
                 "image": "#/$defs/ImageCanvasItem",
+                "library": "#/$defs/LibraryCanvasItem",
                 "stack": "#/$defs/StackCanvasItem",
                 "subject": "#/$defs/SubjectCanvasItem",
                 "text": "#/$defs/TextCanvasItem",
                 "timeline": "#/$defs/TimelineCanvasItem",
                 "tool": "#/$defs/ToolCanvasItem",
-                "video": "#/$defs/VideoCanvasItem",
-                "library": "#/$defs/LibraryCanvasItem"
+                "video": "#/$defs/VideoCanvasItem"
               },
               "propertyName": "kind"
             },
@@ -3923,13 +3923,13 @@
                 "file": "#/$defs/FileCanvasItem",
                 "group": "#/$defs/GroupCanvasItem",
                 "image": "#/$defs/ImageCanvasItem",
+                "library": "#/$defs/LibraryCanvasItem",
                 "stack": "#/$defs/StackCanvasItem",
                 "subject": "#/$defs/SubjectCanvasItem",
                 "text": "#/$defs/TextCanvasItem",
                 "timeline": "#/$defs/TimelineCanvasItem",
                 "tool": "#/$defs/ToolCanvasItem",
-                "video": "#/$defs/VideoCanvasItem",
-                "library": "#/$defs/LibraryCanvasItem"
+                "video": "#/$defs/VideoCanvasItem"
               },
               "propertyName": "kind"
             },
@@ -5130,12 +5130,12 @@
                 "director": "#/$defs/DirectorDocument",
                 "image_crop": "#/$defs/ImageCropDocument",
                 "layers": "#/$defs/LayerDocument",
+                "library": "#/$defs/LibraryDocument",
                 "media_edit": "#/$defs/MediaEditDocument",
                 "stack": "#/$defs/StackDocument",
                 "subject": "#/$defs/SubjectDocument",
                 "timeline": "#/$defs/TimelineDocument",
-                "tool": "#/$defs/ToolDocument",
-                "library": "#/$defs/LibraryDocument"
+                "tool": "#/$defs/ToolDocument"
               },
               "propertyName": "kind"
             },
@@ -10665,13 +10665,13 @@
                   "file": "#/$defs/FileCanvasItem",
                   "group": "#/$defs/GroupCanvasItem",
                   "image": "#/$defs/ImageCanvasItem",
+                  "library": "#/$defs/LibraryCanvasItem",
                   "stack": "#/$defs/StackCanvasItem",
                   "subject": "#/$defs/SubjectCanvasItem",
                   "text": "#/$defs/TextCanvasItem",
                   "timeline": "#/$defs/TimelineCanvasItem",
                   "tool": "#/$defs/ToolCanvasItem",
-                  "video": "#/$defs/VideoCanvasItem",
-                  "library": "#/$defs/LibraryCanvasItem"
+                  "video": "#/$defs/VideoCanvasItem"
                 },
                 "propertyName": "kind"
               },
@@ -18290,13 +18290,13 @@
                 "file": "#/$defs/FileCanvasItem",
                 "group": "#/$defs/GroupCanvasItem",
                 "image": "#/$defs/ImageCanvasItem",
+                "library": "#/$defs/LibraryCanvasItem",
                 "stack": "#/$defs/StackCanvasItem",
                 "subject": "#/$defs/SubjectCanvasItem",
                 "text": "#/$defs/TextCanvasItem",
                 "timeline": "#/$defs/TimelineCanvasItem",
                 "tool": "#/$defs/ToolCanvasItem",
-                "video": "#/$defs/VideoCanvasItem",
-                "library": "#/$defs/LibraryCanvasItem"
+                "video": "#/$defs/VideoCanvasItem"
               },
               "propertyName": "kind"
             },
@@ -19439,13 +19439,13 @@
                 "file": "#/$defs/FileCanvasItem",
                 "group": "#/$defs/GroupCanvasItem",
                 "image": "#/$defs/ImageCanvasItem",
+                "library": "#/$defs/LibraryCanvasItem",
                 "stack": "#/$defs/StackCanvasItem",
                 "subject": "#/$defs/SubjectCanvasItem",
                 "text": "#/$defs/TextCanvasItem",
                 "timeline": "#/$defs/TimelineCanvasItem",
                 "tool": "#/$defs/ToolCanvasItem",
-                "video": "#/$defs/VideoCanvasItem",
-                "library": "#/$defs/LibraryCanvasItem"
+                "video": "#/$defs/VideoCanvasItem"
               },
               "propertyName": "kind"
             },
@@ -20306,13 +20306,13 @@
                 "file": "#/$defs/FileCanvasItem",
                 "group": "#/$defs/GroupCanvasItem",
                 "image": "#/$defs/ImageCanvasItem",
+                "library": "#/$defs/LibraryCanvasItem",
                 "stack": "#/$defs/StackCanvasItem",
                 "subject": "#/$defs/SubjectCanvasItem",
                 "text": "#/$defs/TextCanvasItem",
                 "timeline": "#/$defs/TimelineCanvasItem",
                 "tool": "#/$defs/ToolCanvasItem",
-                "video": "#/$defs/VideoCanvasItem",
-                "library": "#/$defs/LibraryCanvasItem"
+                "video": "#/$defs/VideoCanvasItem"
               },
               "propertyName": "kind"
             },
@@ -21549,12 +21549,12 @@
                 "director": "#/$defs/DirectorDocument",
                 "image_crop": "#/$defs/ImageCropDocument",
                 "layers": "#/$defs/LayerDocument",
+                "library": "#/$defs/LibraryDocument",
                 "media_edit": "#/$defs/MediaEditDocument",
                 "stack": "#/$defs/StackDocument",
                 "subject": "#/$defs/SubjectDocument",
                 "timeline": "#/$defs/TimelineDocument",
-                "tool": "#/$defs/ToolDocument",
-                "library": "#/$defs/LibraryDocument"
+                "tool": "#/$defs/ToolDocument"
               },
               "propertyName": "kind"
             },
@@ -27304,13 +27304,13 @@
                   "file": "#/$defs/FileCanvasItem",
                   "group": "#/$defs/GroupCanvasItem",
                   "image": "#/$defs/ImageCanvasItem",
+                  "library": "#/$defs/LibraryCanvasItem",
                   "stack": "#/$defs/StackCanvasItem",
                   "subject": "#/$defs/SubjectCanvasItem",
                   "text": "#/$defs/TextCanvasItem",
                   "timeline": "#/$defs/TimelineCanvasItem",
                   "tool": "#/$defs/ToolCanvasItem",
-                  "video": "#/$defs/VideoCanvasItem",
-                  "library": "#/$defs/LibraryCanvasItem"
+                  "video": "#/$defs/VideoCanvasItem"
                 },
                 "propertyName": "kind"
               },
