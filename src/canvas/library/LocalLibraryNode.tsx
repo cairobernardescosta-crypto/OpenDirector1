@@ -105,9 +105,6 @@ export function LocalLibraryNode({
           </button>
         </div>
       )}
-      {!collectionsBusy && !collectionsError && collections.length === 0 && (
-        <p className="cw-local-library-hint">{t("library.node.chooseHint")}</p>
-      )}
       <label className="cw-local-library-line">
         <span>{t("library.node.mode")}</span>
         <select className="nodrag nopan nowheel" value={state.mode} disabled={locked || !state.collectionId}
