@@ -63,3 +63,12 @@ Na branch `dev`, foram adicionadas as seguintes correções (ainda **não valida
 - Somente mesclar/atualizar local após testes satisfatórios e autorização do usuário para atualização local.
 
 **Dados:** preservar `D:\\OpenDirector1-Dados`, biblioteca original e .venv. Branch de desenvolvimento `dev`; não modificar `main`.
+
+
+## Fase 4 — modos fixo e dinâmico
+
+- Modo **dinâmico** consulta a coleção completa a cada resolução, acompanhando a composição atual da coleção.
+- Modo **fixo** envia ao endpoint de resolução somente os IDs persistidos no nó. A seleção fixa vazia permanece vazia, sem cair silenciosamente para a coleção inteira.
+- A lista exibida, a contagem e o aviso de itens indisponíveis passam a refletir o resultado real da resolução do modo ativo.
+- Alterações nos IDs fixos disparam uma nova resolução; a chave de dependência evita recargas causadas apenas por uma nova referência de array.
+- Cobertura adicionada para a diferença entre resolução dinâmica, seleção fixa e seleção fixa vazia. Os testes locais e a inspeção visual ainda precisam ser executados no Windows.
