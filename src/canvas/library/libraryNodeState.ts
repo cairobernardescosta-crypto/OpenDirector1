@@ -32,7 +32,9 @@ export function parseLibraryNodeState(value: unknown): LibraryNodeState | null {
       (state.activeItemId !== undefined &&
         (typeof state.activeItemId !== "string" || !uuid.test(state.activeItemId))) ||
       (state.activeMediaKind !== undefined &&
-        !["image", "video", "audio", "file"].includes(String(state.activeMediaKind)))) return null;
+        !["image", "video", "audio", "file"].includes(String(state.activeMediaKind))) ||
+      (state.collectionId === "" && (state.itemIds.length > 0 || state.activeItemId !== undefined)) ||
+      ((state.activeItemId === undefined) !== (state.activeMediaKind === undefined))) return null;
   return {
     version: 1, collectionId: state.collectionId, mode: state.mode, itemIds: [...state.itemIds],
     ...(state.activeItemId !== undefined ? { activeItemId: state.activeItemId } : {}),

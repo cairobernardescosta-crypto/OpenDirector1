@@ -172,3 +172,13 @@ test("native library nodes keep their own type and are offered to the Agent as o
   assert.equal(options.length, 1);
   assert.equal(options[0]?.id, `node:${source.id}`);
 });
+
+
+test("native library state rejects selection data without a collection or an active media kind", () => {
+  const source = createNode("library");
+  const invalid = [
+    { ...source, data: { ...source.data, library: { ...initial, collectionId: "", itemIds: [imageId] } } },
+    { ...source, data: { ...source.data, library: { ...initial, activeItemId: imageId } } },
+  ];
+  for (const value of invalid) assert.equal(parseDocument({ ...createDocument(), nodes: [value] }).ok, false);
+});

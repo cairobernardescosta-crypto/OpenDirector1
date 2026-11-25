@@ -642,6 +642,10 @@ class LibraryData(Contract):
         unique(self.itemIds, 'library item IDs')
         if self.mode == 'dynamic' and self.itemIds:
             raise ValueError('Dynamic library nodes cannot persist a fixed item selection')
+        if self.collectionId is None and (self.itemIds or self.activeItemId is not None):
+            raise ValueError('A library selection requires a collection')
+        if (self.activeItemId is None) != (self.activeMediaKind is None):
+            raise ValueError('The active library item and media kind must be stored together')
         return self
 
 

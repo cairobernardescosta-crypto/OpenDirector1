@@ -608,3 +608,7 @@ def test_library_is_a_typed_canvas_editor_and_round_trips_its_configuration():
         LibraryData(collectionId=uid(91), mode='dynamic', itemIds=(uid(92),))
     with pytest.raises(ValidationError, match='library item IDs'):
         LibraryData(collectionId=uid(91), mode='fixed', itemIds=(uid(92), uid(92)))
+    with pytest.raises(ValidationError, match='requires a collection'):
+        LibraryData(mode='fixed', itemIds=(uid(92),))
+    with pytest.raises(ValidationError, match='stored together'):
+        LibraryData(collectionId=uid(91), activeItemId=uid(92))
