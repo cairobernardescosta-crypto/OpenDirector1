@@ -597,23 +597,6 @@ export interface GenerationSubmitCommandInput extends CommandBaseInput {
   readonly payload: GenerationSubmitInput;
 }
 
-export interface LibraryDataInput extends ContractInput {
-  readonly collectionId?: string | null;
-  readonly mode?: "dynamic" | "fixed";
-  readonly itemIds?: ReadonlyArray<string>;
-  readonly activeItemId?: string | null;
-  readonly activeMediaKind?: "image" | "video" | "audio" | "file" | null;
-}
-
-export interface LibraryDocumentInput extends EditorDocumentBaseInput {
-  readonly kind: "library";
-  readonly data: LibraryDataInput;
-}
-
-export interface LibraryCanvasItemInput extends EditorCanvasItemInput {
-  readonly kind: "library";
-}
-
 export interface GroupCanvasItemInput extends CanvasItemBaseInput {
   readonly kind: "group";
   readonly binding?: ContainerBindingInput;
@@ -832,6 +815,23 @@ export interface MaterialBindingInput extends ContractInput {
 export interface MediaCanvasItemInput extends CanvasItemBaseInput {
   readonly binding: EmptyBindingInput | MaterialBindingInput | GenerationBindingInput;
   readonly editors?: ReadonlyArray<EditorRefInput>;
+}
+
+export interface LibraryCanvasItemInput extends EditorCanvasItemInput {
+  readonly kind: "library";
+}
+
+export interface LibraryDataInput extends ContractInput {
+  readonly collectionId?: string | null;
+  readonly mode?: "dynamic" | "fixed";
+  readonly itemIds?: ReadonlyArray<string>;
+  readonly activeItemId?: string | null;
+  readonly activeMediaKind?: "image" | "video" | "audio" | "file" | null;
+}
+
+export interface LibraryDocumentInput extends EditorDocumentBaseInput {
+  readonly kind: "library";
+  readonly data: LibraryDataInput;
 }
 
 export interface MediaEditDataInput extends ContractInput {
@@ -1869,7 +1869,7 @@ export interface CanvasConfigureCommandOperation {
 
 export interface CanvasCreateGeneration extends Contract {
   readonly spec: TextGenerationSpec | ImageGenerationSpec | VideoGenerationSpec | AudioGenerationSpec;
-  readonly item: TextCanvasItem | ImageCanvasItem | VideoCanvasItem | AudioCanvasItem | FileCanvasItem | SubjectCanvasItem | TimelineCanvasItem | StackCanvasItem | ToolCanvasItem | DirectorCanvasItem | GroupCanvasItem;
+  readonly item: TextCanvasItem | ImageCanvasItem | VideoCanvasItem | AudioCanvasItem | FileCanvasItem | SubjectCanvasItem | TimelineCanvasItem | StackCanvasItem | ToolCanvasItem | DirectorCanvasItem | LibraryCanvasItem | GroupCanvasItem;
   readonly references: ReadonlyArray<PinnedReference | FollowingReference>;
 }
 
@@ -1918,7 +1918,7 @@ export interface CanvasHideCommandOperation {
 }
 
 export interface CanvasItemBase extends ProjectEntity {
-  readonly kind: "text" | "image" | "video" | "audio" | "file" | "group" | "timeline" | "subject" | "stack" | "tool" | "external";
+  readonly kind: "text" | "image" | "video" | "audio" | "file" | "library" | "group" | "timeline" | "subject" | "stack" | "tool" | "external";
   readonly title: string;
   readonly position: Point;
   readonly width: number;
@@ -1985,7 +1985,7 @@ export interface CanvasPublishMedia extends Contract {
   readonly itemId: string;
   readonly source: AssetRef | null;
   readonly sourceEditorId: string | null;
-  readonly document: TimelineDocument | SubjectDocument | LayerDocument | ImageCropDocument | StackDocument | ToolDocument | DirectorDocument | MediaEditDocument;
+  readonly document: TimelineDocument | SubjectDocument | LayerDocument | ImageCropDocument | StackDocument | ToolDocument | DirectorDocument | LibraryDocument | MediaEditDocument;
   readonly outputs: ReadonlyArray<MediaPublicationOutput>;
 }
 
@@ -2173,7 +2173,7 @@ export interface EditorInputConnection extends Contract {
 export interface EditorRef extends Contract {
   readonly objectType: "editor_document";
   readonly id: string;
-  readonly kind: "timeline" | "subject" | "stack" | "tool" | "director" | "layers" | "image_crop" | "media_edit";
+  readonly kind: "timeline" | "subject" | "stack" | "tool" | "director" | "library" | "layers" | "image_crop" | "media_edit";
 }
 
 export interface EditorSaveCommand extends CommandBase {
@@ -2481,6 +2481,23 @@ export interface MaterialBinding extends Contract {
 export interface MediaCanvasItem extends CanvasItemBase {
   readonly binding: EmptyBinding | MaterialBinding | GenerationBinding;
   readonly editors: ReadonlyArray<EditorRef>;
+}
+
+export interface LibraryCanvasItem extends EditorCanvasItem {
+  readonly kind: "library";
+}
+
+export interface LibraryData extends Contract {
+  readonly collectionId: string | null;
+  readonly mode: "dynamic" | "fixed";
+  readonly itemIds: ReadonlyArray<string>;
+  readonly activeItemId: string | null;
+  readonly activeMediaKind: "image" | "video" | "audio" | "file" | null;
+}
+
+export interface LibraryDocument extends EditorDocumentBase {
+  readonly kind: "library";
+  readonly data: LibraryData;
 }
 
 export interface MediaEditData extends Contract {
@@ -3294,13 +3311,13 @@ export interface VoiceSelection extends Contract {
   readonly refText: string | null;
 }
 
-export type CanvasItem = TextCanvasItem | ImageCanvasItem | VideoCanvasItem | AudioCanvasItem | FileCanvasItem | SubjectCanvasItem | TimelineCanvasItem | StackCanvasItem | ToolCanvasItem | DirectorCanvasItem | GroupCanvasItem;
+export type CanvasItem = TextCanvasItem | ImageCanvasItem | VideoCanvasItem | AudioCanvasItem | FileCanvasItem | SubjectCanvasItem | TimelineCanvasItem | StackCanvasItem | ToolCanvasItem | DirectorCanvasItem | LibraryCanvasItem | GroupCanvasItem;
 
 export type GenerationSpec = TextGenerationSpec | ImageGenerationSpec | VideoGenerationSpec | AudioGenerationSpec;
 
 export type Reference = PinnedReference | FollowingReference;
 
-export type EditorDocument = TimelineDocument | SubjectDocument | LayerDocument | ImageCropDocument | StackDocument | ToolDocument | DirectorDocument | MediaEditDocument;
+export type EditorDocument = TimelineDocument | SubjectDocument | LayerDocument | ImageCropDocument | StackDocument | ToolDocument | DirectorDocument | LibraryDocument | MediaEditDocument;
 
 export type Command = ProjectCreateCommand | ProjectRenameCommand | ProjectTrashCommand | ProjectRestoreCommand | AssetImportCommand | ArtifactPublishCommand | AssetWriteTextCommand | AssetMetadataCommand | AssetDeleteCommand | CanvasCreateGenerationCommand | CanvasShowCommand | CanvasMoveCommand | CanvasUpdateCommand | CanvasHideCommand | CanvasMaterializeCommand | CanvasApplyEditCommand | CanvasPublishMediaCommand | TimelinePublishRenderCommand | NodeVersionApplyCommand | CanvasConfigureCommand | CanvasEditorAttachCommand | CanvasEditorDetachCommand | SpecCreateCommand | SpecUpdateCommand | SpecRestoreCommand | SpecPromptCommand | ReferenceAddCommand | ReferenceUpdateCommand | ReferenceRestoreCommand | ReferenceRemoveCommand | GenerationSubmitCommand | JobCancelCommand | JobRecoverCommand | JobCheckpointCommand | ResultSelectCommand | EditorCreateCommand | EditorSaveCommand | HistoryUndoCommand | HistoryRedoCommand | BatchCommand;
 
