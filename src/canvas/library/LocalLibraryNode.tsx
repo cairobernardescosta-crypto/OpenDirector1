@@ -10,8 +10,7 @@ import { MediaCard } from "./MediaCard";
 import { LocalLibraryPreview } from "./LocalLibraryPreview";
 import "./local-library-node.css";
 
-/** Library card: the reference manifest is data, not a media generator.
- * Existing text-node persistence keeps historic canvas contracts unchanged. */
+/** Library card: its collection binding is typed node data, never media content. */
 export function LocalLibraryNode({
   id,
   state,

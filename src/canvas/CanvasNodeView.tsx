@@ -38,7 +38,7 @@ const kindNameKeys: Record<CanvasNodeKind, MessageKey> = {
   stack: "canvasNodes.kind.stack",
   tool: "canvasNodes.kind.tool",
   external: "canvasNodes.kind.external",
-  library: "canvasNodes.kind.text",
+  library: "library.node.title",
 };
 
 const toolRoleKeys: Record<string, MessageKey> = {
@@ -75,7 +75,7 @@ function CanvasNodeContents({ id, data, selected }: NodeProps<CanvasFlowNode>) {
       title={data.title || t(kindNameKeys[kind])}
       selected={selected}
       empty={
-        kind === "subject" ? !data.subject?.main?.src : !hasAsset && !data.text
+        kind === "library" ? !libraryState?.collectionId : kind === "subject" ? !data.subject?.main?.src : !hasAsset && !data.text
       }
       busy={Boolean(activity)}
       icon={libraryState ? "rail-folder" : undefined}

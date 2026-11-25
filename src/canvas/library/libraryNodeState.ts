@@ -1,9 +1,5 @@
-/** Native text-binding adapter for collection nodes.
- *
- * The authoritative server only accepts the existing CanvasKind union.
- * Library configuration therefore lives in a text node's persisted manualText
- * until a future explicit versioned CanvasKind migration. Do not interpret
- * this marker as media, an agent instruction, or a trusted reference.
+/** Backward-compatible parser for library nodes stored as text in older projects.
+ * New projects persist LibraryNodeState as typed data on the native library node.
  */
 export const LIBRARY_NODE_MARKER = "opendirector:local-library:v1:";
 

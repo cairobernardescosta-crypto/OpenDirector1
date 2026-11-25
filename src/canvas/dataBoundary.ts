@@ -1101,6 +1101,7 @@ export function sameNodeData(a: CanvasNodeData, b: CanvasNodeData): boolean {
           a.externalType === b.externalType &&
           a.current?.versionId === b.current?.versionId,
       ) &&
+      JSON.stringify(a.library) === JSON.stringify(b.library) &&
       sameLayerDocument(a.layers, b.layers) &&
       JSON.stringify(a.imageCrop) === JSON.stringify(b.imageCrop) &&
       sameLocalStage(a.localStage, b.localStage) &&
