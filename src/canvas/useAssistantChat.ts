@@ -30,6 +30,7 @@ import { isGenerationModel } from "../backend/rules";
 import { resolveGenerationModel } from "./modelResolution.ts";
 import {
   contentText,
+  fingerprintMatches,
   referenceContent,
   referenceIds,
   type ReferenceAsset,
