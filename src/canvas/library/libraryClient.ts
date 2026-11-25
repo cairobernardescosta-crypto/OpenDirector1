@@ -94,8 +94,12 @@ export function itemContentUrl(item: LibraryItem): string {
  * mirroring how canvas nodes load media (CreationClient.mediaUrl).
  */
 /** Reads an item's bytes; used when copying library media into a canvas. */
-export async function itemBlob(item: LibraryItem): Promise<Blob> {
-  const response = await fetch(itemContentUrl(item), { headers });
+export async function itemBlob(
+  item: LibraryItem,
+  signal?: AbortSignal,
+): Promise<Blob> {
+  signal?.throwIfAborted();
+  const response = await fetch(itemContentUrl(item), { headers, signal });
   if (!response.ok) throw await responseError(response);
   return response.blob();
 }

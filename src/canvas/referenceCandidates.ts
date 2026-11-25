@@ -4,6 +4,7 @@ import { nodeMentionOptions, type MentionOption } from "./referenceMentions.ts";
 import type { ReferenceAsset } from "./chatReferenceContent.ts";
 import { assetDisplayName } from "./assetNames.ts";
 import { tNow } from "../i18n/messages.ts";
+import { parseLibraryNode } from "./library/libraryNodeState.ts";
 
 export function assetOptionId(
   asset: Pick<ReferenceAsset, "id" | "nodeId" | "sourceRole">,
@@ -17,13 +18,30 @@ export function referenceCandidates(
   assets: readonly ReferenceAsset[],
   issue: (node: CanvasNode) => string | null = () => null,
 ): MentionOption[] {
+  const libraryNodes = nodes.filter(
+    (node) => node.type === "text" && parseLibraryNode(node.data.text),
+  );
+  const regularNodes = nodes.filter((node) => !libraryNodes.includes(node));
   const options = nodeMentionOptions(
-    nodes,
+    regularNodes,
     issue,
     tNow("errors.refs.canvasMaterial"),
   ).map(
     (option) => ({ ...option, id: `node:${option.id}` }),
   );
+  for (const node of libraryNodes) {
+    const state = parseLibraryNode(node.data.text);
+    if (!state?.collectionId) continue;
+    options.push({
+      id: `node:${node.id}`,
+      kind: "text",
+      title: assetDisplayName(node.data.title || "Biblioteca local"),
+      detail: `${tNow("library.node.collection")} · ${tNow(
+        state.mode === "dynamic" ? "library.node.dynamic" : "library.node.fixed",
+      )}`,
+      disabledReason: null,
+    });
+  }
   for (const asset of assets) {
     if (asset.available === false) continue;
     if (!["image", "video", "audio", "text"].includes(asset.kind ?? ""))

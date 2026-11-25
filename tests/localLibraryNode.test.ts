@@ -5,6 +5,7 @@ import { parseDocument, serializeDocument } from "../src/canvas/storage.ts";
 import { canStartReference, canSourceReference, referenceMaterial, referenceIssue } from "../src/canvas/connectionPolicy.ts";
 import { referencePortDirection } from "../src/canvas/connectionPorts.ts";
 import { assistantReferences } from "../src/canvas/assistantReferences.ts";
+import { referenceCandidates } from "../src/canvas/referenceCandidates.ts";
 import { pendingCanvasReferences } from "../src/canvas/pendingCanvasReferences.ts";
 import { encodeLibraryNode, isLibraryNodeText, parseLibraryNode, libraryCreationKinds, libraryResolutionSelection } from "../src/canvas/library/libraryNodeState.ts";
 
@@ -130,4 +131,25 @@ test("assistant selection cannot read a library manifest as a Gemini prompt", ()
   const [pending] = pendingCanvasReferences([source]);
   assert.ok(pending?.error);
   assert.deepEqual(pending?.identity.references, []);
+});
+
+
+test("library node is offered to the Agent as one collection mention", () => {
+  const source = createNode("text", undefined, {
+    title: "Campanha de novembro",
+    text: encodeLibraryNode({ ...initial, mode: "dynamic", itemIds: [] }),
+  });
+  const options = referenceCandidates([source], []);
+  assert.equal(options.length, 1);
+  assert.equal(options[0]?.id, `node:${source.id}`);
+  assert.equal(options[0]?.title, "Campanha de novembro");
+  assert.ok(options[0]?.detail);
+});
+
+test("library node without a selected collection is not offered as an Agent mention", () => {
+  const source = createNode("text", undefined, {
+    title: "Biblioteca local",
+    text: encodeLibraryNode({ ...initial, collectionId: "" }),
+  });
+  assert.deepEqual(referenceCandidates([source], []), []);
 });

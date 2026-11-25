@@ -26,6 +26,17 @@ import { fingerprint } from "../backend/generation";
 import { getActiveLocale } from "../i18n/messages.ts";
 import type { BackendModels } from "../backend/models";
 import { loadReferenceCatalog } from "../backend/referenceCatalog.ts";
+import { assertReferenceSize } from "./uploadPolicy.ts";
+import {
+  itemBlob,
+  resolveCollection,
+  withMediaSuffix,
+} from "./library/libraryClient.ts";
+import {
+  libraryResolutionSelection,
+  parseLibraryNode,
+} from "./library/libraryNodeState.ts";
+import { createLibraryReferenceBatch } from "./library/libraryReferenceContract.ts";
 import { isGenerationModel } from "../backend/rules";
 import { resolveGenerationModel } from "./modelResolution.ts";
 import {
@@ -411,7 +422,15 @@ export function useAssistantChat(
   ) =>
     add(
       async (signal) => {
-        const invalid = pendingCanvasReferences(nodes).filter(
+        const libraryNodes = nodes.flatMap((node) => {
+          if (node.type !== "text") return [];
+          const state = parseLibraryNode(node.data.text);
+          return state ? [{ node, state }] : [];
+        });
+        const canvasNodes = nodes.filter(
+          (node) => !libraryNodes.some((entry) => entry.node.id === node.id),
+        );
+        const invalid = pendingCanvasReferences(canvasNodes).filter(
           (item) => item.error,
         );
         if (invalid.length)
@@ -422,11 +441,87 @@ export function useAssistantChat(
                 .join(" "),
             }),
           );
-        {
-          const client = creationClient(projectId);
-          await client.refresh();
-          const catalog = await loadReferenceCatalog(projectId, signal);
-          const selected = nodes.flatMap((node) => {
+
+        const client = creationClient(projectId);
+        await client.refresh();
+        let catalog = await loadReferenceCatalog(projectId, signal);
+        const selected: ReferenceAsset[] = [];
+
+        // One library card is one logical batch. Files are copied into the
+        // project asset store for Agent access, without creating Canvas nodes.
+        for (const { node, state } of libraryNodes) {
+          signal.throwIfAborted();
+          if (!state.collectionId)
+            throw new Error("Escolha uma coleção no nó Biblioteca antes de enviá-la ao Agent.");
+          const resolution = await resolveCollection(
+            state.collectionId,
+            libraryResolutionSelection(state),
+          );
+          const batch = createLibraryReferenceBatch(node.id, state, resolution);
+          if (batch.unavailableItemIds.length)
+            throw new Error(
+              `A coleção "${batch.collectionName}" contém ${batch.unavailableItemIds.length} arquivo(s) indisponível(is). Atualize a seleção antes de enviar.`,
+            );
+          if (!batch.references.length)
+            throw new Error(`A coleção "${batch.collectionName}" não possui mídias selecionadas.`);
+          if (current.current.assets.length + selected.length + batch.references.length > 64)
+            throw new Error(t("assistant.error.tooManyReferences"));
+
+          for (const reference of batch.references) {
+            signal.throwIfAborted();
+            const item = resolution.items.find((candidate) => candidate.id === reference.itemId);
+            if (!item || item.state !== "active" || item.revision !== reference.revision)
+              throw new Error(`O arquivo "${reference.name}" mudou desde a resolução da Biblioteca. Atualize o nó e tente novamente.`);
+
+            const declaredSize = reference.byteSize ?? item.metadata?.size;
+            if (declaredSize != null)
+              assertReferenceSize(reference.mediaKind, declaredSize);
+            const blob = await itemBlob(item, signal);
+            assertReferenceSize(reference.mediaKind, blob.size);
+            if (declaredSize != null && blob.size !== declaredSize)
+              throw new Error(`O tamanho do arquivo "${reference.name}" mudou durante a leitura.`);
+
+            const digest = await fingerprint(blob);
+            const existing = catalog.find(
+              (asset) =>
+                asset.available &&
+                asset.kind === reference.mediaKind &&
+                fingerprintMatches(asset, digest),
+            );
+            if (existing) {
+              selected.push(existing);
+              continue;
+            }
+
+            const uploaded = await client.importBlob(
+              blob,
+              withMediaSuffix(reference.name, reference.mimeType),
+              reference.mediaKind,
+              undefined,
+              undefined,
+              signal,
+            );
+            const asset = client.snapshot.assets.find(
+              (candidate) => candidate.id === uploaded.assetId,
+            );
+            if (!asset)
+              throw new Error(`Não foi possível confirmar a importação de "${reference.name}" para o projeto.`);
+            const prepared: ReferenceAsset = {
+              id: asset.id,
+              name: asset.name,
+              kind: asset.kind,
+              type: asset.metadata.mimeType,
+              size: asset.metadata.size,
+              fingerprint: asset.fingerprint,
+              available: true,
+            };
+            catalog = [...catalog, prepared];
+            selected.push(prepared);
+          }
+        }
+
+        if (canvasNodes.length) {
+          const canvasAssets = canvasNodes.flatMap((node) => {
             const assets = catalog.filter(
               (asset) => asset.nodeId === node.id && asset.available,
             );
@@ -434,7 +529,7 @@ export function useAssistantChat(
               throw new Error(t("assistant.error.noUsableAssets"));
             return assets;
           });
-          for (const asset of selected) {
+          for (const asset of canvasAssets) {
             signal.throwIfAborted();
             if (
               (await fingerprint(await client.blob(asset.id))) !==
@@ -442,8 +537,9 @@ export function useAssistantChat(
             )
               throw new Error(t("assistant.error.referenceChangedBatch"));
           }
-          return selected;
+          selected.push(...canvasAssets);
         }
+        return selected;
       },
       signal,
       commit,
