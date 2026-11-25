@@ -583,6 +583,27 @@ def test_library_is_a_typed_canvas_editor_and_round_trips_its_configuration():
     assert LibraryDocument.model_validate_json(document.model_dump_json()) == document
     assert LibraryCanvasItem.model_validate_json(item.model_dump_json()) == item
     assert document.data.itemIds == (uid(92), uid(93))
+
+    # The normal project snapshot storage contract retains both sides of the
+    # typed editor binding, not a text-manifest fallback.
+    base = project_example()
+    stored_document = LibraryDocument(
+        id=uid(95), projectId=base.project.id, kind='library',
+        data=LibraryData(collectionId=uid(96), mode='dynamic'),
+    )
+    stored_item = LibraryCanvasItem(
+        id=uid(97), projectId=base.project.id, kind='library',
+        binding=dict(role='editor', objectRef=dict(id=stored_document.id, kind='library')),
+    )
+    snapshot = ProjectSnapshot.model_validate({
+        **base.model_dump(mode='python'),
+        'editorDocuments': (*base.editorDocuments, stored_document),
+        'canvasItems': (*base.canvasItems, stored_item),
+    })
+    reopened = ProjectSnapshot.model_validate_json(snapshot.model_dump_json())
+    assert reopened.editorDocuments[-1] == stored_document
+    assert reopened.canvasItems[-1] == stored_item
+
     with pytest.raises(ValidationError, match='Dynamic library nodes'):
         LibraryData(collectionId=uid(91), mode='dynamic', itemIds=(uid(92),))
     with pytest.raises(ValidationError, match='library item IDs'):
