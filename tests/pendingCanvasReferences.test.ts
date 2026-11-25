@@ -100,6 +100,17 @@ test("same-named selected nodes retain separate identities; title and material c
   );
 });
 
+test("project-owned media can be staged by asset ID even when no preview URL is present", () => {
+  const image = createNode("image", undefined, {
+    title: "Asset without preview",
+    backendAssetId: "asset-123",
+  });
+  const staged = pendingCanvasReferences([image])[0]!;
+  assert.equal(staged.error, null);
+  assert.equal(staged.thumbnail, undefined);
+  assert.equal(staged.identity.references[0]!.assetId, "asset-123");
+});
+
 test("subjects stage one node with its actual main image; description-only subjects cannot be inserted", () => {
   const subject = createNode("subject", undefined, {
     title: "角色",

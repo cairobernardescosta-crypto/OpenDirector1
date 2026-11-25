@@ -33,7 +33,7 @@ export function pendingCanvasReferences(
           ? Boolean(data.text?.trim())
           : node.type === "subject"
             ? Boolean(data.subject?.main?.src)
-            : Boolean(data.src);
+            : Boolean(data.src || data.backendAssetId);
       const error = !supported
         ? tNow("errors.pendingRef.unsupported")
         : data.assetState === "missing"
@@ -85,6 +85,7 @@ export function samePendingReferences(
           return (
             ref.kind === next.kind &&
             ref.title === next.title &&
+            ref.assetId === next.assetId &&
             ref.src === next.src &&
             ref.text === next.text
           );

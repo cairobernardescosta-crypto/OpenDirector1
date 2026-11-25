@@ -33,7 +33,7 @@ export function assistantReferences(
         });
     } else if (
       ["image", "video", "audio"].includes(node.type) &&
-      data.src &&
+      (data.src || data.backendAssetId) &&
       data.assetState !== "missing"
     ) {
       references.push({
@@ -41,7 +41,7 @@ export function assistantReferences(
         assetId: data.backendAssetId,
         kind: node.type as "image" | "video" | "audio",
         title: data.title,
-        src: data.src,
+        ...(data.src ? { src: data.src } : {}),
       });
     }
   }

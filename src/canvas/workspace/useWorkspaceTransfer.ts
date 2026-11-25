@@ -163,19 +163,32 @@ export function useWorkspaceTransfer(rt: WorkspaceRuntime) {
     const issues: string[] = [];
     for (const item of items) {
       try {
-        const blob = await itemBlob(item);
         const resource = itemToResource(item);
-        // The backend identifies uploads by suffix, and library items made from
-        // canvas nodes carry a bare title ("图片 1"), so complete the name.
-        const name = withMediaSuffix(
-          item.name,
-          item.metadata?.mimeType || blob.type,
-        );
-        // The library blob must become a canvas-owned asset before a node
-        // can reference it, so the copy survives independently of the library.
-        const ref = await client.importBlob(blob, name, resource.kind);
-        resource.assetId = ref.assetId;
-        resource.src = await client.mediaUrl(ref.assetId);
+        // Reuse a project-owned asset when the library item came from this
+        // same project. Cross-project and library-only items still need copying.
+        const existing = item.origin.type === "canvas" &&
+            item.origin.projectId === doc.id && item.origin.assetId
+          ? client.snapshot.assets.find((asset) =>
+              asset.id === item.origin.assetId &&
+              asset.available &&
+              asset.kind === resource.kind
+            )
+          : undefined;
+        if (existing) {
+          resource.assetId = existing.id;
+          resource.src = await client.mediaUrl(existing.id);
+        } else {
+          const blob = await itemBlob(item);
+          // Canvas-origin titles can be extensionless; the asset API needs a suffix.
+          const name = withMediaSuffix(
+            item.name,
+            item.metadata?.mimeType || blob.type,
+          );
+          // Import only when the destination project does not already own the asset.
+          const ref = await client.importBlob(blob, name, resource.kind);
+          resource.assetId = ref.assetId;
+          resource.src = await client.mediaUrl(ref.assetId);
+        }
 
         await importCanvasResource(resource, targetNodeId, worldPosition);
         placed += 1;
