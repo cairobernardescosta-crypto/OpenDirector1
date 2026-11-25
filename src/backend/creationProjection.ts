@@ -1098,7 +1098,7 @@ export class CreationProjection {
           ...common,
           kind,
           data: {
-            collectionId: node.data.library?.collectionId ?? null,
+            collectionId: node.data.library?.collectionId || null,
             mode: node.data.library?.mode ?? "dynamic",
             itemIds: [...(node.data.library?.itemIds ?? [])],
             activeItemId: node.data.library?.activeItemId ?? null,

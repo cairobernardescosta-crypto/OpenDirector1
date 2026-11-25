@@ -554,3 +554,36 @@ def test_audio_generation_options_match_shared_validation(protocol, allowed):
     legacy = config.inputRules.model_dump(mode='json', exclude={'generateAudioOptions'})
     from opendirector.domain.creation.models import InputRules
     assert InputRules.model_validate(legacy).model_dump(mode='json') == legacy
+
+
+def test_library_is_a_typed_canvas_editor_and_round_trips_its_configuration():
+    from opendirector.domain.creation.canvas import LibraryCanvasItem
+    from opendirector.domain.creation.editors import LibraryData, LibraryDocument
+
+    project_id = uid(1)
+    document = LibraryDocument(
+        id=uid(90),
+        projectId=project_id,
+        kind='library',
+        data=LibraryData(
+            collectionId=uid(91),
+            mode='fixed',
+            itemIds=(uid(92), uid(93)),
+            activeItemId=uid(93),
+            activeMediaKind='image',
+        ),
+    )
+    item = LibraryCanvasItem(
+        id=uid(94),
+        projectId=project_id,
+        kind='library',
+        title='Biblioteca',
+        binding=dict(role='editor', objectRef=dict(id=document.id, kind='library')),
+    )
+    assert LibraryDocument.model_validate_json(document.model_dump_json()) == document
+    assert LibraryCanvasItem.model_validate_json(item.model_dump_json()) == item
+    assert document.data.itemIds == (uid(92), uid(93))
+    with pytest.raises(ValidationError, match='Dynamic library nodes'):
+        LibraryData(collectionId=uid(91), mode='dynamic', itemIds=(uid(92),))
+    with pytest.raises(ValidationError, match='library item IDs'):
+        LibraryData(collectionId=uid(91), mode='fixed', itemIds=(uid(92), uid(92)))

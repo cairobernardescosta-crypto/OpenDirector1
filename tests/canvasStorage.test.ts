@@ -161,3 +161,30 @@ test("an unknown provenance source is rejected rather than trusted", () => {
   raw.nodes[0]!.data.generationProvenance = { source: "forged" };
   assert.equal(parseDocument(raw).ok, false);
 });
+
+
+test("native library collection configuration survives local project storage", () => {
+  const document = createDocument("Biblioteca");
+  const node = createNode("library", { x: 120, y: 80 }, {
+    library: {
+      version: 1,
+      collectionId: "6f1d1f3e-0000-4000-8000-000000000000",
+      mode: "fixed",
+      itemIds: [
+        "6f1d1f3e-0000-4000-8000-000000000001",
+        "6f1d1f3e-0000-4000-8000-000000000002",
+      ],
+      activeItemId: "6f1d1f3e-0000-4000-8000-000000000002",
+      activeMediaKind: "image",
+    },
+  });
+  document.nodes = [node];
+  const serialized = serializeDocument(document);
+  assert.equal(serialized.ok, true);
+  if (!serialized.ok) return;
+  const restored = parseDocument(serialized.value);
+  assert.equal(restored.ok, true);
+  if (!restored.ok) return;
+  assert.equal(restored.value.nodes[0]!.type, "library");
+  assert.deepEqual(restored.value.nodes[0]!.data.library, node.data.library);
+});

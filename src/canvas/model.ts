@@ -416,7 +416,7 @@ export function createNode(
     audio: "canvasNodes.kind.audio",
     file: "canvasNodes.kind.file",
     text: "canvasNodes.kind.text",
-    library: "canvasNodes.kind.text",
+    library: "library.node.title",
     group: "canvasNodes.kind.group",
     timeline: "canvasNodes.kind.timeline",
     subject: "canvasNodes.kind.subject",

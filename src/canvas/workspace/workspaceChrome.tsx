@@ -127,7 +127,7 @@ export const nodeKindKeys: Record<CanvasNodeKind, MessageKey> = {
   video: "canvas.workspace.kind.video",
   audio: "canvas.workspace.kind.audio",
   text: "canvas.workspace.kind.text",
-  library: "canvas.workspace.kind.text",
+  library: "library.node.title",
   file: "canvas.workspace.kind.file",
   group: "canvas.workspace.kind.group",
   timeline: "canvas.workspace.kind.timeline",
