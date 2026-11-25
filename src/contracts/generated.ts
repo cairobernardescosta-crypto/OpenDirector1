@@ -2187,7 +2187,7 @@ export interface EditorSaveCommandOperation {
 }
 
 export interface EditorWrite extends Contract {
-  readonly document: TimelineDocument | SubjectDocument | LayerDocument | ImageCropDocument | StackDocument | ToolDocument | DirectorDocument | MediaEditDocument;
+  readonly document: TimelineDocument | SubjectDocument | LayerDocument | ImageCropDocument | StackDocument | ToolDocument | DirectorDocument | LibraryDocument | MediaEditDocument;
 }
 
 export interface EmptyBinding extends Contract {
