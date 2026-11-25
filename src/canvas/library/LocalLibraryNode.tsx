@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CanvasActions } from "../CanvasActionsContext";
 import { CanvasIcon } from "../CanvasIcon";
 import { useT } from "../../i18n/I18nProvider";
@@ -35,6 +35,11 @@ export function LocalLibraryNode({
   const [shown, setShown] = useState(12);
   const [refresh, setRefresh] = useState(0);
   const [previewItem, setPreviewItem] = useState<LibraryItem | null>(null);
+  const latestState = useRef(state);
+
+  useEffect(() => {
+    latestState.current = state;
+  }, [state]);
 
   useEffect(() => {
     let active = true;
@@ -73,8 +78,10 @@ export function LocalLibraryNode({
   }, [state.collectionId, refresh]);
 
   const change = (patch: Partial<LibraryNodeState>) => {
-    if (locked) return;
-    actions?.update(id, { text: encodeLibraryNode({ ...state, ...patch }) });
+    if (locked || !actions) return;
+    const next = { ...latestState.current, ...patch };
+    latestState.current = next;
+    actions.update(id, { text: encodeLibraryNode(next) });
   };
   const current = collections.find((item) => item.id === state.collectionId);
   const matching = resolved?.items.filter((item) =>
