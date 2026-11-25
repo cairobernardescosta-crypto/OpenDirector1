@@ -4,7 +4,7 @@ import { CanvasIcon } from "../CanvasIcon";
 import { useT } from "../../i18n/I18nProvider";
 import { errorMessage } from "../../backend/api";
 import { listCollections, resolveCollection, type LibraryCollection, type LibraryCollectionResolution, type LibraryMediaKind, type LibraryItem } from "./libraryClient";
-import { encodeLibraryNode, type LibraryNodeState } from "./libraryNodeState";
+import { encodeLibraryNode, libraryResolutionSelection, type LibraryNodeState } from "./libraryNodeState";
 import { MediaCard } from "./MediaCard";
 import { LocalLibraryPreview } from "./LocalLibraryPreview";
 import "./local-library-node.css";
@@ -60,13 +60,18 @@ export function LocalLibraryNode({
     return () => { active = false; };
   }, [collectionsRefresh]);
 
+  const fixedItemIdsKey = state.mode === "fixed" ? state.itemIds.join(",") : "";
+
   useEffect(() => {
     let active = true;
     setResolved(null);
     setError("");
     if (!state.collectionId) { setBusy(false); return; }
     setBusy(true);
-    resolveCollection(state.collectionId)
+    resolveCollection(
+      state.collectionId,
+      libraryResolutionSelection(state),
+    )
       .then((data) => {
         if (!active) return;
         setError("");
@@ -75,7 +80,7 @@ export function LocalLibraryNode({
       .catch((reason) => { if (active) setError(errorMessage(reason)); })
       .finally(() => { if (active) setBusy(false); });
     return () => { active = false; };
-  }, [state.collectionId, refresh]);
+  }, [state.collectionId, state.mode, fixedItemIdsKey, refresh]);
 
   const change = (patch: Partial<LibraryNodeState>) => {
     if (locked || !actions) return;
@@ -151,10 +156,10 @@ export function LocalLibraryNode({
             </button>
           </div>
           <div className="cw-local-library-meta">
-            <span>{state.mode === "fixed" ? resolved.items.filter((item) => state.itemIds.includes(item.id)).length : resolved.items.length} {t("library.node.files")}</span>
-            {(state.mode === "fixed" ? state.itemIds.filter((id) => !resolved.items.some((item) => item.id === id)).length : resolved.unavailableIds.length) > 0 && (
+            <span>{resolved.items.length} {t("library.node.files")}</span>
+            {resolved.unavailableIds.length > 0 && (
               <span className="cw-local-library-error">
-                {state.mode === "fixed" ? state.itemIds.filter((id) => !resolved.items.some((item) => item.id === id)).length : resolved.unavailableIds.length} {t("library.node.missing")}
+                {resolved.unavailableIds.length} {t("library.node.missing")}
               </span>
             )}
           </div>
