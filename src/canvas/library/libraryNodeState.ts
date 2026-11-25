@@ -63,6 +63,14 @@ export function libraryCreationKinds(state: LibraryNodeState | null) {
     : ["image", "video", "audio", "file"] as const;
 }
 
+/** Dynamic nodes resolve the live collection; fixed nodes resolve only their saved IDs.
+ * An empty fixed selection intentionally stays empty instead of falling back to all files. */
+export function libraryResolutionSelection(
+  state: LibraryNodeState,
+): readonly string[] | undefined {
+  return state.mode === "fixed" ? state.itemIds : undefined;
+}
+
 export function isLibraryNodeText(text?: string): boolean {
   return parseLibraryNode(text) !== null;
 }
