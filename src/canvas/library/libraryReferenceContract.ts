@@ -80,6 +80,12 @@ export function createLibraryReferenceBatch(
     throw new Error("The resolved collection does not match the library node.");
   if (new Set(resolution.itemIds).size !== resolution.itemIds.length)
     throw new Error("The resolved collection contains duplicate item IDs.");
+  if (new Set(resolution.items.map((item) => item.id)).size !== resolution.items.length)
+    throw new Error("The collection resolution contains duplicate media records.");
+  if (resolution.items.some((item) => !resolution.itemIds.includes(item.id)))
+    throw new Error("The collection resolution contains an unrequested media record.");
+  if (resolution.unavailableIds.some((id) => !resolution.itemIds.includes(id)))
+    throw new Error("The collection resolution contains an unrelated unavailable ID.");
 
   if (
     state.mode === "fixed" &&
