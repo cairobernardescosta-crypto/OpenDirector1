@@ -15,7 +15,7 @@ export const SEARCH_CATEGORIES = [
 export type SearchCategory = (typeof SEARCH_CATEGORIES)[number][0];
 
 const categoryFor = (kind: CanvasNodeKind): SearchCategory =>
-  kind === "file" || kind === "stack" || kind === "external" ? "other" : kind;
+  kind === "file" || kind === "stack" || kind === "external" || kind === "library" ? "other" : kind;
 
 /** Counts and visible rows always come from the same local query result. */
 export function searchNodes(
