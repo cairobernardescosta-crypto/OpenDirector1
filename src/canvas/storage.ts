@@ -34,6 +34,7 @@ const NODE_KINDS: CanvasNodeKind[] = [
   "audio",
   "file",
   "text",
+  "library",
   "group",
   "timeline",
   "subject",
