@@ -20,3 +20,9 @@ Older projects may contain a text node whose text begins with `opendirector:loca
 ## Agent integration
 
 The native node is offered as one Agent mention. The Agent resolves its collection and selection through the Library client, then receives the media references through the existing reference transport. The Library manifest is never treated as prompt text or as a media-generation source.
+
+## Integrity and safety
+
+The Agent resolves the collection before transfer and confirms it again after reading the selected bytes. If collection membership, availability, item revision, media kind, MIME type, or byte size changes during that interval, the batch is rejected. Missing and trashed IDs remain unavailable; another item is never substituted. Resolution payloads reject duplicate or malformed IDs and enforce the 1,000-item selection limit. Agent references retain the existing 64-reference cap, and duplicate project asset IDs are attached only once.
+
+The node lock is preserved in project storage. It protects the node's canvas interaction state; it is not an access-control boundary for the underlying Library files. The project stores only the collection binding and selection, so reopening resolves the current Library state again rather than restoring stale media bytes.
