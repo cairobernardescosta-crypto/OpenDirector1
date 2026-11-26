@@ -7,7 +7,7 @@ import { referencePortDirection } from "../src/canvas/connectionPorts.ts";
 import { assistantReferences } from "../src/canvas/assistantReferences.ts";
 import { referenceCandidates } from "../src/canvas/referenceCandidates.ts";
 import { pendingCanvasReferences } from "../src/canvas/pendingCanvasReferences.ts";
-import { encodeLibraryNode, isLibraryNodeText, parseLibraryNode, libraryCreationKinds, libraryResolutionSelection, parseLibraryNodeState, setLibraryNodeMode, toggleLibraryNodeItem } from "../src/canvas/library/libraryNodeState.ts";
+import { encodeLibraryNode, isLibraryNodeText, parseLibraryNode, libraryCreationKinds, libraryResolutionSelection, parseLibraryNodeState, setLibraryNodeMode, toggleLibraryNodeItem, type LibraryNodeState } from "../src/canvas/library/libraryNodeState.ts";
 
 const collectionId = "11111111-1111-4111-8111-111111111111";
 const imageId = "22222222-2222-4222-8222-222222222222";
@@ -43,7 +43,7 @@ test("rapid library changes apply successively to the latest state and survive r
   });
   let document = { ...createDocument(), nodes: [node] };
 
-  const updateState = (next: typeof initial) => {
+  const updateState = (next: LibraryNodeState): LibraryNodeState => {
     document = applyCommand(document, {
       type: "update-node",
       id: node.id,
