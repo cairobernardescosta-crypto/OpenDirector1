@@ -175,7 +175,6 @@ export function useWorkspaceTransfer(rt: WorkspaceRuntime) {
             item.origin.projectId === doc.id && item.origin.assetId
           ? client.snapshot.assets.find((asset) =>
               asset.id === item.origin.assetId &&
-              asset.available &&
               asset.kind === resource.kind
             )
           : undefined;
