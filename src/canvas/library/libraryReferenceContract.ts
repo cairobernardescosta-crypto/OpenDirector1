@@ -65,6 +65,7 @@ export function assertLibraryResolutionStable(
       next.state !== "active" ||
       item.state !== "active" ||
       next.revision !== item.revision ||
+      next.blob !== item.blob ||
       next.mediaKind !== item.mediaKind ||
       next.metadata?.size !== item.metadata?.size ||
       next.metadata?.mimeType !== item.metadata?.mimeType
