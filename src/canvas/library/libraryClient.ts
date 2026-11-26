@@ -407,22 +407,30 @@ export type LibraryCollectionResolution = {
   unavailableIds: string[];
 };
 
-function normalizeCollectionResolution(
+export function normalizeCollectionResolution(
   value: LibraryCollectionResolution,
   requestedCollectionId: string,
   fixedItemIds?: readonly string[],
 ): LibraryCollectionResolution {
   if (!value || typeof value !== "object" ||
       value.collectionId !== requestedCollectionId ||
-      typeof value.collectionName !== "string" ||
+      typeof value.collectionName !== "string" || !value.collectionName.trim() ||
       !Array.isArray(value.itemIds) || !Array.isArray(value.items) ||
       !Array.isArray(value.unavailableIds))
     throw new Error("A biblioteca retornou uma resolução de coleção inválida.");
 
   const resolvedIds = value.itemIds;
-  if (!resolvedIds.every((itemId) => typeof itemId === "string") ||
+  const validId = (itemId: unknown): itemId is string =>
+    typeof itemId === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(itemId);
+  if (resolvedIds.length > 1000 ||
+      !resolvedIds.every(validId) ||
       new Set(resolvedIds).size !== resolvedIds.length)
-    throw new Error("A resolução da biblioteca contém IDs inválidos ou duplicados.");
+    throw new Error("A resolução da biblioteca contém IDs inválidos, duplicados ou acima do limite.");
+
+  if (fixedItemIds !== undefined &&
+      (fixedItemIds.length > 1000 || !fixedItemIds.every(validId)))
+    throw new Error("A seleção fixa da biblioteca excede o limite ou contém IDs inválidos.");
 
   const itemIds = fixedItemIds === undefined ? [...resolvedIds] : [...fixedItemIds];
   if (fixedItemIds !== undefined &&
@@ -434,16 +442,24 @@ function normalizeCollectionResolution(
   const allowed = new Set(itemIds);
   const itemsById = new Map<string, LibraryItem>();
   for (const item of value.items) {
-    if (!item || typeof item.id !== "string" || !allowed.has(item.id) ||
-        itemsById.has(item.id))
-      throw new Error("A resolução da biblioteca contém arquivos inesperados ou duplicados.");
+    if (!item || !validId(item.id) || !allowed.has(item.id) ||
+        itemsById.has(item.id) ||
+        (item.kind !== "asset" && item.kind !== "subject") ||
+        (item.state !== "active" && item.state !== "trashed") ||
+        !Number.isSafeInteger(item.revision) || item.revision < 1 ||
+        typeof item.name !== "string" || !item.name.trim())
+      throw new Error("A resolução da biblioteca contém registros inválidos, inesperados ou duplicados.");
+    if (item.metadata &&
+        (typeof item.metadata.mimeType !== "string" ||
+         !Number.isSafeInteger(item.metadata.size) || item.metadata.size < 0))
+      throw new Error("A resolução da biblioteca contém metadados de arquivo inválidos.");
     itemsById.set(item.id, item);
   }
 
   const unavailable = new Set<string>();
   for (const itemId of value.unavailableIds) {
-    if (typeof itemId !== "string" || !allowed.has(itemId))
-      throw new Error("A resolução da biblioteca contém IDs indisponíveis inválidos.");
+    if (!validId(itemId) || !allowed.has(itemId) || unavailable.has(itemId))
+      throw new Error("A resolução da biblioteca contém IDs indisponíveis inválidos ou duplicados.");
     unavailable.add(itemId);
   }
   for (const itemId of itemIds) {
