@@ -99,9 +99,20 @@ export async function itemBlob(
   signal?: AbortSignal,
 ): Promise<Blob> {
   signal?.throwIfAborted();
+  if (
+    item.kind !== "asset" ||
+    item.state !== "active" ||
+    !item.mediaKind ||
+    !Number.isSafeInteger(item.revision) ||
+    item.revision < 1
+  )
+    throw new Error("O arquivo da Biblioteca não está ativo ou não possui uma versão válida.");
   const response = await fetch(itemContentUrl(item), { headers, signal });
   if (!response.ok) throw await responseError(response);
-  return response.blob();
+  const blob = await response.blob();
+  if (item.metadata?.size != null && blob.size !== item.metadata.size)
+    throw new Error(`O tamanho do arquivo "${item.name}" mudou durante a leitura.`);
+  return blob;
 }
 
 /**
