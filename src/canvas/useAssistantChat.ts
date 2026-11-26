@@ -476,8 +476,8 @@ export function useAssistantChat(
             );
           if (!batch.references.length)
             throw new Error(`A coleção "${batch.collectionName}" não possui mídias selecionadas.`);
-          const ensureReferenceCapacity = () => {
-            if (current.current.assets.length + selected.length > 64)
+          const ensureReferenceCapacity = (additional = 0) => {
+            if (current.current.assets.length + selected.length + additional > 64)
               throw new Error(t("assistant.error.tooManyReferences"));
           };
 
@@ -511,7 +511,7 @@ export function useAssistantChat(
             // Check after content deduplication, before creating a new project
             // asset. This avoids rejecting repeated/identical library entries
             // while keeping the 64-reference ceiling strict.
-            ensureReferenceCapacity();
+            ensureReferenceCapacity(1);
             const uploaded = await client.importBlob(
               blob,
               withMediaSuffix(reference.name, reference.mimeType),
@@ -536,7 +536,6 @@ export function useAssistantChat(
             };
             catalog = [...catalog, prepared];
             appendSelected(prepared);
-            ensureReferenceCapacity();
           }
 
           // Confirm the collection and every source revision are unchanged
