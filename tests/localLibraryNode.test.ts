@@ -174,6 +174,21 @@ test("native library nodes keep their own type and are offered to the Agent as o
 });
 
 
+
+test("native library state rejects duplicate IDs, dynamic snapshots and selections over 1000", () => {
+  const validId = (index: number) =>
+    `00000000-0000-4000-8000-${index.toString(16).padStart(12, "0")}`;
+  const invalid = [
+    { ...initial, itemIds: [imageId, imageId] },
+    { ...initial, mode: "dynamic" as const, itemIds: [imageId] },
+    { ...initial, itemIds: Array.from({ length: 1001 }, (_, index) => validId(index + 1)) },
+  ];
+  for (const library of invalid) {
+    const node = createNode("library", undefined, { library });
+    assert.equal(parseDocument({ ...createDocument(), nodes: [node] }).ok, false);
+  }
+});
+
 test("native library state rejects selection data without a collection or an active media kind", () => {
   const source = createNode("library");
   const invalid = [
