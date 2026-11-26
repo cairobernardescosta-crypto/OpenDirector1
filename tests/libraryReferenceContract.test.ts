@@ -235,6 +235,15 @@ test("a second resolution detects collection edits, deletion and revision change
   );
   assert.throws(
     () => assertLibraryResolutionStable(before, resolution(
+      [imageId, videoId], [
+        { ...asset(imageId, "image"), blob: "b".repeat(64) },
+        asset(videoId, "video"),
+      ],
+    )),
+    /alterado durante a leitura/,
+  );
+  assert.throws(
+    () => assertLibraryResolutionStable(before, resolution(
       [imageId, videoId], [asset(videoId, "video")], [imageId],
     )),
     /coleção ou a disponibilidade/,
