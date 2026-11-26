@@ -90,6 +90,22 @@ test("reference insertion replaces only the caret range and keeps surrounding te
   );
 });
 
+test("one Library node creates one @mention option, not one option per media item", () => {
+  const library = createNode("library", undefined, {
+    title: "Campanha semanal",
+    library: {
+      version: 1,
+      collectionId: "11111111-1111-4111-8111-111111111111",
+      mode: "dynamic",
+      itemIds: [],
+    },
+  });
+  const options = referenceCandidates([library], []);
+  assert.equal(options.length, 1);
+  assert.equal(options[0]!.id, `node:${library.id}`);
+  assert.equal(options[0]!.title, "Campanha semanal");
+});
+
 test("upstream references exclude blank/missing/timeline nodes and include subjects", () => {
   const image = createNode("image", undefined, {
     title: "图片一",
