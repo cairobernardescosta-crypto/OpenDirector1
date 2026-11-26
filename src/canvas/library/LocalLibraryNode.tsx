@@ -92,9 +92,15 @@ export function LocalLibraryNode({
     return () => { active = false; };
   }, [state.collectionId, state.mode, fixedItemIdsKey, refresh]);
 
-  const change = (patch: Partial<LibraryNodeState>) => {
+  const change = (
+    update:
+      | Partial<LibraryNodeState>
+      | ((current: LibraryNodeState) => LibraryNodeState),
+  ) => {
     if (locked || !actions) return;
-    const next = { ...latestState.current, ...patch };
+    const current = latestState.current;
+    const next =
+      typeof update === "function" ? update(current) : { ...current, ...update };
     latestState.current = next;
     actions.update(id, native ? { library: next } : { text: encodeLibraryNode(next) });
   };
@@ -131,11 +137,14 @@ export function LocalLibraryNode({
         <span>{t("library.node.mode")}</span>
         <select className="nodrag nopan nowheel" value={state.mode} disabled={locked || !state.collectionId}
           onPointerDown={(event) => event.stopPropagation()}
-          onChange={(event) => change(setLibraryNodeMode(
-            state,
-            event.target.value === "fixed" ? "fixed" : "dynamic",
-            resolved?.items.map((item) => item.id) ?? [],
-          ))}>
+          onChange={(event) => {
+            const mode = event.target.value === "fixed" ? "fixed" : "dynamic";
+            change((current) => setLibraryNodeMode(
+              current,
+              mode,
+              resolved?.items.map((item) => item.id) ?? [],
+            ));
+          }}>
           <option value="dynamic">{t("library.node.dynamic")}</option>
           <option value="fixed">{t("library.node.fixed")}</option>
         </select>
@@ -182,14 +191,16 @@ export function LocalLibraryNode({
                 item={item.mediaKind === "image" || item.mediaKind === "video" || item.mediaKind === "audio" ? item : undefined}
                 icon={item.mediaKind ?? "file"}
                 selectable={state.mode === "fixed" && !locked}
+                disabled={locked}
                 selected={state.mode === "fixed" ? state.itemIds.includes(item.id) : state.activeItemId === item.id}
-                onOpen={() => change({
+                onOpen={() => change((current) => ({
+                  ...current,
                   activeItemId: item.id,
                   activeMediaKind: item.mediaKind ?? "file",
-                  ...(state.mode === "fixed" && !state.itemIds.includes(item.id)
-                    ? { itemIds: [...state.itemIds, item.id].slice(0, 1000) }
+                  ...(current.mode === "fixed" && !current.itemIds.includes(item.id)
+                    ? { itemIds: [...current.itemIds, item.id].slice(0, 1000) }
                     : {}),
-                })}
+                }))}
                 action={state.activeItemId === item.id ? (
                   <>
                     <button type="button" className="cw-local-library-extract cw-local-library-view nodrag nopan"
@@ -215,7 +226,7 @@ export function LocalLibraryNode({
                     )}
                   </>
                 ) : undefined}
-                onSelect={() => change(toggleLibraryNodeItem(state, item.id))}
+                onSelect={() => change((current) => toggleLibraryNodeItem(current, item.id))}
               />
               </div>
             ))}
