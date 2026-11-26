@@ -3,6 +3,20 @@ import assert from "node:assert/strict";
 import { createNode } from "../src/canvas/model.ts";
 import { assistantReferences } from "../src/canvas/assistantReferences.ts";
 
+test("a native or legacy Library node is configuration, not an individual media mention", () => {
+  const native = createNode("library");
+  const legacy = createNode("text", undefined, {
+    title: "Biblioteca",
+    text: "opendirector:local-library:v1:" + JSON.stringify({
+      version: 1,
+      collectionId: "11111111-1111-4111-8111-111111111111",
+      mode: "dynamic",
+      itemIds: [],
+    }),
+  });
+  assert.deepEqual(assistantReferences([native, legacy]), []);
+});
+
 test("assistant references can carry a project asset without forcing a preview URL", () => {
   const image = createNode("image", undefined, {
     title: "Asset only",
