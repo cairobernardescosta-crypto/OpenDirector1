@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import type { LibraryCollectionResolution, LibraryItem } from "../src/canvas/library/libraryClient.ts";
-import { createLibraryReferenceBatch } from "../src/canvas/library/libraryReferenceContract.ts";
+import { normalizeCollectionResolution, type LibraryCollectionResolution, type LibraryItem } from "../src/canvas/library/libraryClient.ts";
+import { assertLibraryResolutionStable, createLibraryReferenceBatch } from "../src/canvas/library/libraryReferenceContract.ts";
 import {
   setLibraryNodeMode,
   toggleLibraryNodeItem,
@@ -140,6 +140,76 @@ test("requires a stable source node ID", () => {
   );
 });
 
+
+
+test("trashed files are unavailable and never replaced by another collection item", () => {
+  const trashed = { ...asset(imageId, "image"), state: "trashed" as const };
+  const result = createLibraryReferenceBatch(
+    "library-node-1",
+    state("dynamic"),
+    resolution([imageId, videoId], [trashed, asset(videoId, "video")]),
+  );
+  assert.deepEqual(result.references.map((item) => item.itemId), [videoId]);
+  assert.deepEqual(result.unavailableItemIds, [imageId]);
+});
+
+test("normalization marks absent files unavailable and preserves fixed order", () => {
+  const raw = resolution(
+    [videoId, missingId, imageId],
+    [asset(imageId, "image"), asset(videoId, "video")],
+  );
+  const normalized = normalizeCollectionResolution(raw, collectionId, [videoId, missingId, imageId]);
+  assert.deepEqual(normalized.itemIds, [videoId, missingId, imageId]);
+  assert.deepEqual(normalized.unavailableIds, [missingId]);
+  assert.deepEqual(normalized.items.map((item) => item.id), [videoId, imageId]);
+});
+
+test("normalization rejects duplicate, malformed, unexpected and oversized records", () => {
+  const base = resolution([imageId], [asset(imageId, "image")]);
+  assert.throws(
+    () => normalizeCollectionResolution({ ...base, itemIds: [imageId, imageId] }, collectionId),
+    /IDs inválidos, duplicados/,
+  );
+  assert.throws(
+    () => normalizeCollectionResolution({ ...base, unavailableIds: [imageId, imageId] }, collectionId),
+    /indisponíveis inválidos ou duplicados/,
+  );
+  assert.throws(
+    () => normalizeCollectionResolution({ ...base, items: [{ ...asset(imageId, "image"), revision: 0 }] }, collectionId),
+    /registros inválidos/,
+  );
+  assert.throws(
+    () => normalizeCollectionResolution({ ...base, items: [{ ...asset(imageId, "image"), metadata: { ...asset(imageId, "image").metadata!, size: -1 } }] }, collectionId),
+    /metadados de arquivo inválidos/,
+  );
+  assert.throws(
+    () => normalizeCollectionResolution(base, collectionId, Array.from({ length: 1001 }, () => imageId)),
+    /excede o limite/,
+  );
+});
+
+test("a second resolution detects collection edits, deletion and revision changes", () => {
+  const before = resolution([imageId, videoId], [asset(imageId, "image"), asset(videoId, "video")]);
+  assert.doesNotThrow(() => assertLibraryResolutionStable(before, resolution(
+    [imageId, videoId], [asset(imageId, "image"), asset(videoId, "video")],
+  )));
+  assert.throws(
+    () => assertLibraryResolutionStable(before, resolution([videoId], [asset(videoId, "video")])),
+    /coleção ou a disponibilidade/,
+  );
+  assert.throws(
+    () => assertLibraryResolutionStable(before, resolution(
+      [imageId, videoId], [{ ...asset(imageId, "image"), revision: 4 }, asset(videoId, "video")],
+    )),
+    /alterado durante a leitura/,
+  );
+  assert.throws(
+    () => assertLibraryResolutionStable(before, resolution(
+      [imageId, videoId], [asset(videoId, "video")], [imageId],
+    )),
+    /coleção ou a disponibilidade/,
+  );
+});
 
 test("switching modes clears stale fixed IDs and snapshots dynamic collection IDs", () => {
   assert.deepEqual(
