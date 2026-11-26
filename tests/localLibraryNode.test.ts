@@ -7,7 +7,7 @@ import { referencePortDirection } from "../src/canvas/connectionPorts.ts";
 import { assistantReferences } from "../src/canvas/assistantReferences.ts";
 import { referenceCandidates } from "../src/canvas/referenceCandidates.ts";
 import { pendingCanvasReferences } from "../src/canvas/pendingCanvasReferences.ts";
-import { encodeLibraryNode, isLibraryNodeText, parseLibraryNode, libraryCreationKinds, libraryResolutionSelection } from "../src/canvas/library/libraryNodeState.ts";
+import { encodeLibraryNode, isLibraryNodeText, parseLibraryNode, libraryCreationKinds, libraryResolutionSelection, parseLibraryNodeState, setLibraryNodeMode, toggleLibraryNodeItem } from "../src/canvas/library/libraryNodeState.ts";
 
 const collectionId = "11111111-1111-4111-8111-111111111111";
 const imageId = "22222222-2222-4222-8222-222222222222";
@@ -34,28 +34,45 @@ test("library card state survives native canvas serialization and undo", () => {
 });
 
 
-test("rapid library changes merge against the latest selection and survive reopen", () => {
-  const first = { ...initial, activeItemId: imageId, activeMediaKind: "image" as const };
+test("rapid library changes apply successively to the latest state and survive reopen", () => {
   const secondId = "33333333-3333-4333-8333-333333333333";
-  const afterSecondSelection = {
-    ...first,
-    itemIds: [...first.itemIds, secondId],
-  };
-  const finalState = {
-    ...afterSecondSelection,
-    mode: "dynamic" as const,
-  };
+  const thirdId = "44444444-4444-4444-8444-444444444444";
   const node = createNode("text", { x: 10, y: 20 }, {
     title: "Biblioteca local",
-    text: encodeLibraryNode(finalState),
+    text: encodeLibraryNode(initial),
   });
-  const saved = serializeDocument({ ...createDocument(), nodes: [node] });
+  let document = { ...createDocument(), nodes: [node] };
+
+  const updateState = (next: typeof initial) => {
+    document = applyCommand(document, {
+      type: "update-node",
+      id: node.id,
+      patch: { data: { text: encodeLibraryNode(next) } },
+    });
+    const latest = parseLibraryNode(document.nodes[0]?.data.text);
+    assert.ok(latest, "cada atualização deve deixar um estado válido");
+    return latest!;
+  };
+
+  let latest = parseLibraryNode(node.data.text)!;
+  latest = updateState(toggleLibraryNodeItem(latest, secondId));
+  assert.deepEqual(latest.itemIds, [imageId, secondId]);
+  latest = updateState(toggleLibraryNodeItem(latest, thirdId));
+  assert.deepEqual(latest.itemIds, [imageId, secondId, thirdId]);
+  latest = updateState(setLibraryNodeMode(latest, "dynamic"));
+  assert.equal(latest.mode, "dynamic");
+  assert.deepEqual(latest.itemIds, []);
+  latest = updateState(setLibraryNodeMode(latest, "fixed", [secondId, thirdId]));
+  assert.equal(latest.mode, "fixed");
+  assert.deepEqual(latest.itemIds, [secondId, thirdId]);
+
+  const saved = serializeDocument(document);
   assert.equal(saved.ok, true);
   if (!saved.ok) return;
   const reopened = parseDocument(saved.value);
   assert.equal(reopened.ok, true);
   if (!reopened.ok) return;
-  assert.deepEqual(parseLibraryNode(reopened.value.nodes[0]?.data.text), finalState);
+  assert.deepEqual(parseLibraryNode(reopened.value.nodes[0]?.data.text), latest);
 });
 
 test("dynamic mode resolves the live collection and fixed mode resolves only saved IDs", () => {
@@ -189,11 +206,29 @@ test("native library state rejects duplicate IDs, dynamic snapshots and selectio
   }
 });
 
+test("active library item and media kind must be present together", () => {
+  const valid = { ...initial, activeItemId: imageId, activeMediaKind: "image" as const };
+  assert.deepEqual(parseLibraryNodeState(valid), valid);
+  assert.equal(parseLibraryNodeState({ ...valid, activeMediaKind: undefined }), null);
+  assert.equal(parseLibraryNodeState({ ...initial, activeMediaKind: "image" }), null);
+});
+
 test("native library state rejects selection data without a collection or an active media kind", () => {
   const source = createNode("library");
   const invalid = [
     { ...source, data: { ...source.data, library: { ...initial, collectionId: "", itemIds: [imageId] } } },
     { ...source, data: { ...source.data, library: { ...initial, activeItemId: imageId } } },
+    { ...source, data: { ...source.data, library: { ...initial, activeMediaKind: "image" } } },
   ];
   for (const value of invalid) assert.equal(parseDocument({ ...createDocument(), nodes: [value] }).ok, false);
+
+  const emptyCollection = {
+    version: 1 as const,
+    collectionId: "",
+    mode: "fixed" as const,
+    itemIds: [],
+  };
+  assert.deepEqual(parseLibraryNodeState(emptyCollection), emptyCollection);
+  const validEmptyNode = createNode("library", undefined, { library: emptyCollection });
+  assert.equal(parseDocument({ ...createDocument(), nodes: [validEmptyNode] }).ok, true);
 });
