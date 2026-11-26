@@ -64,9 +64,7 @@ export function libraryResolutionSelection(
   return state.mode === "fixed" ? state.itemIds : undefined;
 }
 
-export function isLibraryNodeText(text?: string): boolean {
-  return parseLibraryNode(text) !== null;
-}
+
 
 
 /** Switches selection mode without allowing stale IDs to leak into dynamic mode. */
