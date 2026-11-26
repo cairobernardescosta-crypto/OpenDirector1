@@ -78,6 +78,36 @@ test("creates ordered typed references without copying bytes or generating canva
   assert.deepEqual(result.unavailableItemIds, []);
 });
 
+test("preserves image, video, audio, and file media kinds in one library batch", () => {
+  const ids = [
+    "55555555-5555-4555-8555-555555555555",
+    "66666666-6666-4666-8666-666666666666",
+    "77777777-7777-4777-8777-777777777777",
+    "88888888-8888-4888-8888-888888888888",
+  ];
+  const kinds = ["image", "video", "audio", "file"] as const;
+  const result = createLibraryReferenceBatch(
+    "library-node-1",
+    state("dynamic"),
+    resolution(ids, kinds.map((kind, index) => ({
+      ...asset(ids[index]!, kind),
+      name: `original-${kind}`,
+      metadata: {
+        ...asset(ids[index]!, kind).metadata!,
+        mimeType: kind === "image" ? "image/png"
+          : kind === "video" ? "video/mp4"
+          : kind === "audio" ? "audio/mpeg"
+          : "application/pdf",
+      },
+    }))),
+  );
+
+  assert.equal(result.references.length, 4);
+  assert.deepEqual(result.references.map((item) => item.mediaKind), kinds);
+  assert.deepEqual(result.references.map((item) => item.itemId), ids);
+  assert.deepEqual(result.unavailableItemIds, []);
+});
+
 test("fixed mode must resolve exactly the saved IDs in the saved order", () => {
   const fixed = state("fixed", [imageId, videoId]);
   const exact = resolution(
