@@ -5,6 +5,7 @@ import {
   contentText,
   referenceContent,
   referenceIds,
+  validContent,
   type ReferenceAsset,
   type ReferenceContent,
 } from "../src/canvas/chatReferenceContent.ts";
@@ -129,6 +130,23 @@ test("over-limit and mismatched-version insertions reject the entire batch", () 
     /整批未插入/,
   );
   assert.deepEqual(referenceIds(body), ["a"]);
+});
+
+test("the Agent reference limit accepts 64 unique assets and rejects 65", () => {
+  const references: ReferenceContent = Array.from({ length: 64 }, (_, index) => ({
+    type: "reference" as const,
+    assetId: `asset-${index}`,
+    name: `media-${index}.png`,
+    fingerprint: null,
+  }));
+  assert.equal(validContent(references), true);
+  assert.equal(validContent([...references, {
+    type: "reference",
+    assetId: "asset-64",
+    name: "media-64.png",
+    fingerprint: null,
+  }]), false);
+  assert.equal(validContent([...references, references[0]!]), true);
 });
 
 test("line breaks and spaces left by deletion keep the editor empty", () => {
