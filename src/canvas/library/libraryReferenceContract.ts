@@ -39,6 +39,42 @@ export interface LibraryReferenceBatch {
   unavailableItemIds: string[];
 }
 
+/**
+ * Re-resolve after reading bytes. A collection edit, deletion, restore, or
+ * item revision change during transfer must abort the batch rather than mix
+ * two different library snapshots.
+ */
+export function assertLibraryResolutionStable(
+  before: LibraryCollectionResolution,
+  after: LibraryCollectionResolution,
+): void {
+  const sameIds = (left: string[], right: string[]) =>
+    left.length === right.length && left.every((id, index) => id === right[index]);
+  if (
+    before.collectionId !== after.collectionId ||
+    !sameIds(before.itemIds, after.itemIds) ||
+    !sameIds(before.unavailableIds, after.unavailableIds)
+  )
+    throw new Error("A coleção ou a disponibilidade dos arquivos mudou durante a leitura. Atualize a Biblioteca e tente novamente.");
+
+  const current = new Map(after.items.map((item) => [item.id, item]));
+  for (const item of before.items) {
+    const next = current.get(item.id);
+    if (
+      !next ||
+      next.state !== "active" ||
+      item.state !== "active" ||
+      next.revision !== item.revision ||
+      next.mediaKind !== item.mediaKind ||
+      next.metadata?.size !== item.metadata?.size ||
+      next.metadata?.mimeType !== item.metadata?.mimeType
+    )
+      throw new Error(`O arquivo "${item.name}" foi removido ou alterado durante a leitura. Nenhum substituto foi usado.`);
+  }
+  if (after.items.some((item) => !before.items.some((old) => old.id === item.id)))
+    throw new Error("A coleção recebeu novos arquivos durante a leitura. Atualize a Biblioteca e tente novamente.");
+}
+
 function referenceFromItem(
   item: LibraryItem,
   collectionId: string,
