@@ -163,6 +163,31 @@ test("an unknown provenance source is rejected rather than trusted", () => {
 });
 
 
+
+test("locked native library nodes retain their lock and collection after reopening", () => {
+  const document = createDocument("Biblioteca bloqueada");
+  const node = {
+    ...createNode("library", { x: 40, y: 60 }, {
+      library: {
+        version: 1 as const,
+        collectionId: "6f1d1f3e-0000-4000-8000-000000000000",
+        mode: "fixed" as const,
+        itemIds: ["6f1d1f3e-0000-4000-8000-000000000001"],
+      },
+    }),
+    locked: true,
+  };
+  document.nodes = [node];
+  const saved = serializeDocument(document);
+  assert.equal(saved.ok, true);
+  if (!saved.ok) return;
+  const reopened = parseDocument(saved.value);
+  assert.equal(reopened.ok, true);
+  if (!reopened.ok) return;
+  assert.equal(reopened.value.nodes[0]?.locked, true);
+  assert.deepEqual(reopened.value.nodes[0]?.data.library, node.data.library);
+});
+
 test("native library collection configuration survives local project storage", () => {
   const document = createDocument("Biblioteca");
   const node = createNode("library", { x: 120, y: 80 }, {
