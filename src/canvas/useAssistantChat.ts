@@ -37,7 +37,7 @@ import {
   parseLibraryNode,
   parseLibraryNodeState,
 } from "./library/libraryNodeState.ts";
-import { createLibraryReferenceBatch } from "./library/libraryReferenceContract.ts";
+import { assertLibraryResolutionStable, createLibraryReferenceBatch } from "./library/libraryReferenceContract.ts";
 import { isGenerationModel } from "../backend/rules";
 import { resolveGenerationModel } from "./modelResolution.ts";
 import {
@@ -448,6 +448,16 @@ export function useAssistantChat(
         await client.refresh();
         let catalog = await loadReferenceCatalog(projectId, signal);
         const selected: ReferenceAsset[] = [];
+        const appendSelected = (asset: ReferenceAsset) => {
+          // Two library entries may contain identical bytes, or the same
+          // project asset may already be attached. Keep one attachment per
+          // immutable project asset ID.
+          if (
+            !current.current.assets.some((existing) => existing.id === asset.id) &&
+            !selected.some((existing) => existing.id === asset.id)
+          )
+            selected.push(asset);
+        };
 
         // One library card is one logical batch. Files are copied into the
         // project asset store for Agent access, without creating Canvas nodes.
@@ -491,7 +501,7 @@ export function useAssistantChat(
                 fingerprintMatches(asset, digest),
             );
             if (existing) {
-              selected.push(existing);
+              appendSelected(existing);
               continue;
             }
 
@@ -518,8 +528,16 @@ export function useAssistantChat(
               available: true,
             };
             catalog = [...catalog, prepared];
-            selected.push(prepared);
+            appendSelected(prepared);
           }
+
+          // Confirm the collection and every source revision are unchanged
+          // after the bytes have been read. A stale snapshot never gets sent.
+          const confirmed = await resolveCollection(
+            state.collectionId,
+            libraryResolutionSelection(state),
+          );
+          assertLibraryResolutionStable(resolution, confirmed);
         }
 
         if (canvasNodes.length) {
