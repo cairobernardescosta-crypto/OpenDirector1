@@ -226,7 +226,11 @@ export function LocalLibraryNode({
                     )}
                   </>
                 ) : undefined}
-                onSelect={() => change((current) => toggleLibraryNodeItem(current, item.id))}
+                onSelect={() => change((current) =>
+                  current.mode === "fixed"
+                    ? toggleLibraryNodeItem(current, item.id)
+                    : current
+                )}
               />
               </div>
             ))}
