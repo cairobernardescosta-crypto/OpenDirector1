@@ -65,7 +65,11 @@ test("Python discovery supports PATH-only installs and preserves explicit and ve
     import { pythonExecutable } from ${JSON.stringify(new URL("./browser/host.mjs", import.meta.url).href)};
     import { execFileSync } from 'node:child_process';
     const python = pythonExecutable();
-    const prefix = execFileSync(python, ['-c', 'import sys; print(sys.prefix)'], {encoding:'utf8'}).trim();
+    const prefix = execFileSync(
+      python,
+      ["-c", "import sys; sys.stdout.buffer.write(sys.prefix.encode('utf-8'))"],
+      { encoding: "utf8" },
+    ).trim();
     console.log(JSON.stringify({python, prefix}));
   `;
   const discover = (environment: NodeJS.ProcessEnv) => JSON.parse(execFileSync(
