@@ -64,9 +64,6 @@ export function libraryResolutionSelection(
   return state.mode === "fixed" ? state.itemIds : undefined;
 }
 
-
-
-
 /** Switches selection mode without allowing stale IDs to leak into dynamic mode. */
 export function setLibraryNodeMode(
   state: LibraryNodeState,
